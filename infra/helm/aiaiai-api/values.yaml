@@ -1,0 +1,373 @@
+# AIAIAI Consulting API Helm Chart Values
+# Production-ready configuration for Kubernetes deployment
+
+replicaCount: 3
+
+image:
+  repository: aiaiai/api
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+  hosts:
+    - host: api.aiaiai.cl
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: aiaiai-api-tls
+      hosts:
+        - api.aiaiai.cl
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app
+            operator: In
+            values:
+            - aiaiai-api
+        topologyKey: kubernetes.io/hostname
+
+# Environment variables
+env:
+  NODE_ENV: production
+  PORT: 3000
+  LOG_LEVEL: info
+  
+  # Database
+  DATABASE_URL: "postgresql://username:password@rds-endpoint:5432/aiaiai"
+  DATABASE_SSL: "true"
+  
+  # Redis
+  REDIS_URL: "redis://redis-endpoint:6379"
+  REDIS_PASSWORD: "redis-password"
+  
+  # JWT
+  JWT_SECRET: "your-jwt-secret"
+  JWT_EXPIRES_IN: "7d"
+  
+  # OpenAI
+  OPENAI_API_KEY: "your-openai-api-key"
+  
+  # External APIs
+  GMAIL_CLIENT_ID: "your-gmail-client-id"
+  GMAIL_CLIENT_SECRET: "your-gmail-client-secret"
+  WHATSAPP_TOKEN: "your-whatsapp-token"
+  
+  # Monitoring
+  JAEGER_ENDPOINT: "http://jaeger-collector:14268/api/traces"
+  
+  # Security
+  CORS_ORIGINS: "https://aiaiai.cl,https://app.aiaiai.cl"
+  RATE_LIMIT_MAX: "100"
+  RATE_LIMIT_WINDOW: "60000"
+
+# Secrets (should be managed by external secret management)
+secrets:
+  database:
+    name: aiaiai-database-secret
+    keys:
+      - username
+      - password
+      - host
+      - port
+      - database
+  
+  redis:
+    name: aiaiai-redis-secret
+    keys:
+      - password
+      - host
+      - port
+  
+  external-apis:
+    name: aiaiai-external-apis-secret
+    keys:
+      - openai-api-key
+      - gmail-client-id
+      - gmail-client-secret
+      - whatsapp-token
+
+# ConfigMaps
+configMaps:
+  app-config:
+    name: aiaiai-app-config
+    data:
+      app.name: "AIAIAI Consulting API"
+      app.version: "1.0.0"
+      app.environment: "production"
+      
+      # Feature flags
+      features.agents.lead-scorer: "true"
+      features.agents.proposal-builder: "true"
+      features.agents.meeting-summarizer: "true"
+      features.agents.crm-updater: "true"
+      features.agents.followup-scheduler: "true"
+      
+      # Business rules
+      business.lead-scorer.threshold.hot: "80"
+      business.lead-scorer.threshold.warm: "60"
+      business.lead-scorer.threshold.cold: "40"
+      
+      business.proposal-builder.max-sections: "10"
+      business.proposal-builder.min-sections: "5"
+      
+      business.meeting-summarizer.max-summary-length: "500"
+      business.meeting-summarizer.min-action-items: "1"
+      business.meeting-summarizer.max-action-items: "20"
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+# Network Policies
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3000
+
+# Service Monitor for Prometheus
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  path: /metrics
+  labels:
+    app: aiaiai-api
+    component: api
+
+# Horizontal Pod Autoscaler
+hpa:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+# Pod Security Context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+# Container Security Context
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+      - ALL
+
+# Volume mounts for read-only root filesystem
+volumeMounts:
+  - name: tmp
+    mountPath: /tmp
+  - name: cache
+    mountPath: /app/cache
+
+volumes:
+  - name: tmp
+    emptyDir: {}
+  - name: cache
+    emptyDir: {}
+
+# Init containers
+initContainers:
+  - name: wait-for-db
+    image: postgres:15-alpine
+    command: ['sh', '-c', 'until pg_isready -h $DATABASE_HOST -p $DATABASE_PORT; do sleep 1; done']
+    env:
+      - name: DATABASE_HOST
+        valueFrom:
+          secretKeyRef:
+            name: aiaiai-database-secret
+            key: host
+      - name: DATABASE_PORT
+        valueFrom:
+          secretKeyRef:
+            name: aiaiai-database-secret
+            key: port
+
+# Sidecar containers
+sidecars:
+  - name: jaeger-agent
+    image: jaegertracing/jaeger-agent:latest
+    args:
+      - --reporter.grpc.host-port=jaeger-collector:14250
+    ports:
+      - containerPort: 5775
+        protocol: UDP
+      - containerPort: 6831
+        protocol: UDP
+      - containerPort: 6832
+        protocol: UDP
+      - containerPort: 5778
+        protocol: TCP
+
+# Backup configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: "30d"
+  destination: "s3://aiaiai-backups/api/"
+
+# Monitoring and alerting
+monitoring:
+  enabled: true
+  alerts:
+    - name: HighCPUUsage
+      condition: "cpu_usage > 80%"
+      duration: "5m"
+      severity: "warning"
+    
+    - name: HighMemoryUsage
+      condition: "memory_usage > 85%"
+      duration: "5m"
+      severity: "warning"
+    
+    - name: PodCrashLooping
+      condition: "pod_restart_count > 3"
+      duration: "2m"
+      severity: "critical"
+    
+    - name: HighErrorRate
+      condition: "error_rate > 5%"
+      duration: "5m"
+      severity: "warning"
+
+# Logging configuration
+logging:
+  level: info
+  format: json
+  destination: stdout
+  retention: 30d
+  
+  # Structured logging fields
+  fields:
+    service: "aiaiai-api"
+    version: "1.0.0"
+    environment: "production"
+
+# Performance tuning
+performance:
+  # Node.js specific
+  node:
+    maxOldSpaceSize: "1536"
+    maxSemiSpaceSize: "128"
+  
+  # Application specific
+  app:
+    maxConcurrentRequests: 1000
+    requestTimeout: 30000
+    keepAliveTimeout: 5000
+    
+  # Database connection pool
+  database:
+    maxConnections: 20
+    minConnections: 5
+    connectionTimeout: 10000
+    idleTimeout: 30000
+
+# Security policies
+security:
+  # Pod Security Standards
+  podSecurityStandards:
+    enforce: "restricted"
+    audit: "restricted"
+    warn: "restricted"
+  
+  # Network policies
+  networkPolicies:
+    enabled: true
+    defaultDeny: true
+  
+  # RBAC
+  rbac:
+    enabled: true
+    createServiceAccount: true
+    serviceAccountName: "aiaiai-api"
+  
+  # Security contexts
+  securityContexts:
+    pod: true
+    container: true
+    volume: true

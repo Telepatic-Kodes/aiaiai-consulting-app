@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agents - AIAIAI Consulting</title>
+    <link rel="stylesheet" href="styles-professional.css">
+    <script src="auth.js"></script>
+    <script src="notifications.js"></script>
+    <script src="api.js"></script>
+    <script src="theme.js"></script>
+    <script src="search.js"></script>
+    <script src="shortcuts.js"></script>
+    <script src="animations.js"></script>
+    <script src="loading.js"></script>
+    <script src="accessibility.js"></script>
+    <script src="responsive.js"></script>
+    <script src="typography.js"></script>
+    <style>
+        /* Professional Agents Styles */
+        .agent-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-600);
+        }
+
+        .agent-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--border-secondary);
+        }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .agent-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--primary-100);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-600);
+            flex-shrink: 0;
+        }
+
+        .agent-info h3 {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .agent-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: var(--font-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .agent-status.active {
+            background: var(--success-100);
+            color: var(--success-700);
+        }
+
+        .agent-status.beta {
+            background: var(--warning-100);
+            color: var(--warning-700);
+        }
+
+        .agent-status.development {
+            background: var(--error-100);
+            color: var(--error-700);
+        }
+
+        .agent-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--space-4);
+            margin: var(--space-6) 0;
+        }
+
+        .metric {
+            text-align: center;
+            padding: var(--space-4);
+            background: var(--neutral-50);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-primary);
+        }
+
+        .metric-value {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .metric-label {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .agent-actions {
+            display: flex;
+            gap: var(--space-3);
+            margin-top: var(--space-6);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-12);
+        }
+
+        .stat-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            transition: all var(--transition-normal);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-100);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-4);
+            color: var(--primary-600);
+        }
+
+        .stat-value {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .stat-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .filter-bar {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            margin-bottom: var(--space-8);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: var(--space-4);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .filter-label {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        .filter-select {
+            padding: var(--space-3) var(--space-4);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--space-3) var(--space-4) var(--space-3) var(--space-10);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--space-3);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+        }
+
+        @media (max-width: 768px) {
+            .agent-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .agent-actions {
+                flex-direction: column;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Professional Navigation Header -->
+    <header class="bg-surface border-b border-primary sticky top-0 z-50">
+        <div class="container">
+            <nav class="flex items-center justify-between py-4">
+                <!-- Professional Logo -->
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">AI</span>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-semibold text-primary">AIAIAI Consulting</h1>
+                        <p class="text-xs text-secondary">Executive Platform</p>
+                    </div>
+                </div>
+
+                <!-- Professional Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="dashboard-professional.html" class="text-secondary hover:text-primary transition-colors">Dashboard</a>
+                    <a href="agents-professional.html" class="text-primary font-medium border-b-2 border-primary pb-1">Agents</a>
+                    <a href="clients-professional.html" class="text-secondary hover:text-primary transition-colors">Clients</a>
+                    <a href="projects-professional.html" class="text-secondary hover:text-primary transition-colors">Projects</a>
+                    <a href="reports-professional.html" class="text-secondary hover:text-primary transition-colors">Analytics</a>
+                </div>
+
+                <!-- Professional User Menu -->
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 text-secondary hover:text-primary transition-colors" title="Global Search">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                    <button class="p-2 text-secondary hover:text-primary transition-colors" title="Theme Toggle">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-medium">A</span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container py-8">
+        <!-- Page Header -->
+        <div class="mb-12">
+            <h1 class="text-4xl font-bold text-primary mb-4">AI Agents</h1>
+            <p class="text-xl text-secondary">Manage and monitor your specialized artificial intelligence agents</p>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card animate-slideInUp">
+                <div class="stat-icon">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <div class="stat-value">6</div>
+                <div class="stat-label">Total Agents</div>
+            </div>
+            <div class="stat-card animate-slideInUp" style="animation-delay: 0.1s;">
+                <div class="stat-icon">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <div class="stat-value">4</div>
+                <div class="stat-label">Active</div>
+            </div>
+            <div class="stat-card animate-slideInUp" style="animation-delay: 0.2s;">
+                <div class="stat-icon">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <div class="stat-value">3,833</div>
+                <div class="stat-label">Tasks Completed</div>
+            </div>
+            <div class="stat-card animate-slideInUp" style="animation-delay: 0.3s;">
+                <div class="stat-icon">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="stat-value">100h</div>
+                <div class="stat-label">Time Saved</div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-controls">
+                <div class="search-box">
+                    <svg class="w-5 h-5 search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" class="search-input" placeholder="Search agents...">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select class="filter-select">
+                        <option value="">All</option>
+                        <option value="active">Active</option>
+                        <option value="beta">Beta</option>
+                        <option value="development">Development</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Category</label>
+                    <select class="filter-select">
+                        <option value="">All</option>
+                        <option value="sales">Sales</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="operations">Operations</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+
+        <!-- Agents Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Lead Scorer -->
+            <div class="agent-card animate-slideInLeft">
+                <div class="agent-header">
+                    <div class="agent-icon">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <div class="agent-info">
+                        <h3>Lead Scorer</h3>
+                        <span class="agent-status active">Active</span>
+                    </div>
+                </div>
+                <p class="text-secondary mb-6">Automatically score and prioritize leads for your sales team based on comprehensive analysis.</p>
+                <div class="agent-metrics">
+                    <div class="metric">
+                        <div class="metric-value">85%</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">1,247</div>
+                        <div class="metric-label">Leads</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">20h</div>
+                        <div class="metric-label">Saved</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">$49</div>
+                        <div class="metric-label">Price/mo</div>
+                    </div>
+                </div>
+                <div class="agent-actions">
+                    <button class="btn btn-primary flex-1">Configure</button>
+                    <button class="btn btn-outline">View Logs</button>
+                </div>
+            </div>
+
+            <!-- Proposal Builder -->
+            <div class="agent-card animate-slideInRight">
+                <div class="agent-header">
+                    <div class="agent-icon">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="agent-info">
+                        <h3>Proposal Builder</h3>
+                        <span class="agent-status active">Active</span>
+                    </div>
+                </div>
+                <p class="text-secondary mb-6">Generate professional proposals in 5 minutes instead of 2 hours of manual work.</p>
+                <div class="agent-metrics">
+                    <div class="metric">
+                        <div class="metric-value">95%</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">89</div>
+                        <div class="metric-label">Proposals</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">40h</div>
+                        <div class="metric-label">Saved</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">$79</div>
+                        <div class="metric-label">Price/mo</div>
+                    </div>
+                </div>
+                <div class="agent-actions">
+                    <button class="btn btn-primary flex-1">Configure</button>
+                    <button class="btn btn-outline">View Logs</button>
+                </div>
+            </div>
+
+            <!-- Meeting Summarizer -->
+            <div class="agent-card animate-slideInLeft" style="animation-delay: 0.1s;">
+                <div class="agent-header">
+                    <div class="agent-icon">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                    </div>
+                    <div class="agent-info">
+                        <h3>Meeting Summarizer</h3>
+                        <span class="agent-status active">Active</span>
+                    </div>
+                </div>
+                <p class="text-secondary mb-6">Convert meetings into actionable items with automatic summaries and task generation.</p>
+                <div class="agent-metrics">
+                    <div class="metric">
+                        <div class="metric-value">88%</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">156</div>
+                        <div class="metric-label">Meetings</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">15h</div>
+                        <div class="metric-label">Saved</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">$39</div>
+                        <div class="metric-label">Price/mo</div>
+                    </div>
+                </div>
+                <div class="agent-actions">
+                    <button class="btn btn-primary flex-1">Configure</button>
+                    <button class="btn btn-outline">View Logs</button>
+                </div>
+            </div>
+
+            <!-- CRM Updater -->
+            <div class="agent-card animate-slideInRight" style="animation-delay: 0.1s;">
+                <div class="agent-header">
+                    <div class="agent-icon">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </div>
+                    <div class="agent-info">
+                        <h3>CRM Updater</h3>
+                        <span class="agent-status beta">Beta</span>
+                    </div>
+                </div>
+                <p class="text-secondary mb-6">Keep your database always updated with automatic synchronization and data validation.</p>
+                <div class="agent-metrics">
+                    <div class="metric">
+                        <div class="metric-value">92%</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">2,341</div>
+                        <div class="metric-label">Records</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">25h</div>
+                        <div class="metric-label">Saved</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">$59</div>
+                        <div class="metric-label">Price/mo</div>
+                    </div>
+                </div>
+                <div class="agent-actions">
+                    <button class="btn btn-primary flex-1">Configure</button>
+                    <button class="btn btn-outline">View Logs</button>
+                </div>
+            </div>
+
+            <!-- Follow-up Scheduler -->
+            <div class="agent-card animate-slideInLeft" style="animation-delay: 0.2s;">
+                <div class="agent-header">
+                    <div class="agent-icon">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="agent-info">
+                        <h3>Follow-up Scheduler</h3>
+                        <span class="agent-status development">Development</span>
+                    </div>
+                </div>
+                <p class="text-secondary mb-6">Automate follow-ups and scheduling to never miss an opportunity with intelligent timing.</p>
+                <div class="agent-metrics">
+                    <div class="metric">
+                        <div class="metric-value">90%</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">0</div>
+                        <div class="metric-label">Scheduled</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">0h</div>
+                        <div class="metric-label">Saved</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">$49</div>
+                        <div class="metric-label">Price/mo</div>
+                    </div>
+                </div>
+                <div class="agent-actions">
+                    <button class="btn btn-primary flex-1" disabled>Configure</button>
+                    <button class="btn btn-outline" disabled>View Logs</button>
+                </div>
+            </div>
+
+            <!-- Invoice Generator -->
+            <div class="agent-card animate-slideInRight" style="animation-delay: 0.2s;">
+                <div class="agent-header">
+                    <div class="agent-icon">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                    </div>
+                    <div class="agent-info">
+                        <h3>Invoice Generator</h3>
+                        <span class="agent-status development">Development</span>
+                    </div>
+                </div>
+                <p class="text-secondary mb-6">Generate invoices and receipts automatically with project information and client details.</p>
+                <div class="agent-metrics">
+                    <div class="metric">
+                        <div class="metric-value">0%</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">0</div>
+                        <div class="metric-label">Invoices</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">0h</div>
+                        <div class="metric-label">Saved</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">$39</div>
+                        <div class="metric-label">Price/mo</div>
+                    </div>
+                </div>
+                <div class="agent-actions">
+                    <button class="btn btn-primary flex-1" disabled>Configure</button>
+                    <button class="btn btn-outline" disabled>View Logs</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="text-center py-16 bg-neutral-50 rounded-2xl mt-16">
+            <h2 class="text-3xl font-semibold mb-4">Need a Custom Agent?</h2>
+            <p class="text-xl text-secondary mb-8 max-w-2xl mx-auto">We develop specialized AI agents for your industry and specific business processes</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="btn btn-primary btn-lg">Request Agent</button>
+                <button class="btn btn-outline btn-lg">View Documentation</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Professional Footer -->
+    <footer class="bg-neutral-900 text-white py-12 mt-20">
+        <div class="container">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold">AI</span>
+                        </div>
+                        <span class="font-semibold">AIAIAI Consulting</span>
+                    </div>
+                    <p class="text-neutral-400">World-class consulting for LATAM entrepreneurs</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-neutral-400">
+                        <li><a href="#" class="hover:text-white transition-colors">AI Agents</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Analytics</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Integrations</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-neutral-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">System Status</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-neutral-400">
+                        <li><a href="#" class="hover:text-white transition-colors">About</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-neutral-700 mt-8 pt-8 text-center text-neutral-400">
+                <p>&copy; 2025 AIAIAI Consulting. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,403 @@
+apiVersion: v1
+kind: AgentSpec
+name: meeting.summarizer
+version: 1.0.0
+owner: AIAIAI Consulting
+description: "Resumen automático de reuniones con extracción de tareas accionables y seguimiento"
+responsibility: "Convertir reuniones en acciones concretas y documentación estructurada"
+
+# Input Schema
+inputs:
+  meeting_transcript:
+    type: string
+    required: true
+    description: "Transcripción completa de la reunión"
+  
+  meeting_metadata:
+    type: object
+    required: true
+    properties:
+      title:
+        type: string
+        description: "Título de la reunión"
+      date:
+        type: string
+        format: date-time
+        description: "Fecha y hora de la reunión"
+      duration_minutes:
+        type: integer
+        description: "Duración en minutos"
+      participants:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+              format: email
+            role:
+              type: string
+            company:
+              type: string
+      meeting_type:
+        type: string
+        enum: ["sales", "project", "client", "internal", "strategy", "other"]
+        description: "Tipo de reunión"
+      agenda:
+        type: array
+        items:
+          type: string
+        description: "Agenda de la reunión"
+  
+  context:
+    type: object
+    properties:
+      project_id:
+        type: string
+        description: "ID del proyecto relacionado"
+      client_id:
+        type: string
+        description: "ID del cliente"
+      previous_meetings:
+        type: array
+        items:
+          type: string
+        description: "Referencias a reuniones anteriores"
+      relevant_documents:
+        type: array
+        items:
+          type: string
+        description: "Documentos relevantes para el contexto"
+
+# Output Schema
+outputs:
+  meeting_summary:
+    type: object
+    properties:
+      summary_id:
+        type: string
+        description: "ID único del resumen"
+      executive_summary:
+        type: string
+        description: "Resumen ejecutivo de la reunión"
+      key_decisions:
+        type: array
+        items:
+          type: object
+          properties:
+            decision:
+              type: string
+              description: "Decisión tomada"
+            rationale:
+              type: string
+              description: "Justificación de la decisión"
+            impact:
+              type: string
+              description: "Impacto esperado"
+            owner:
+              type: string
+              description: "Responsable de la decisión"
+      action_items:
+        type: array
+        items:
+          type: object
+          properties:
+            task:
+              type: string
+              description: "Descripción de la tarea"
+            owner:
+              type: string
+              description: "Responsable de la tarea"
+            due_date:
+              type: string
+              format: date
+              description: "Fecha límite"
+            priority:
+              type: string
+              enum: ["low", "medium", "high", "critical"]
+              description: "Prioridad de la tarea"
+            status:
+              type: string
+              enum: ["pending", "in_progress", "completed", "cancelled"]
+              default: "pending"
+              description: "Estado de la tarea"
+            dependencies:
+              type: array
+              items:
+                type: string
+              description: "Tareas dependientes"
+      next_meeting:
+        type: object
+        properties:
+          suggested_date:
+            type: string
+            format: date
+            description: "Fecha sugerida para la próxima reunión"
+          agenda_items:
+            type: array
+            items:
+              type: string
+            description: "Elementos sugeridos para la agenda"
+          required_participants:
+            type: array
+            items:
+              type: string
+            description: "Participantes requeridos"
+      insights:
+        type: array
+        items:
+          type: object
+          properties:
+            insight:
+              type: string
+              description: "Insight identificado"
+            category:
+              type: string
+              enum: ["opportunity", "risk", "trend", "recommendation"]
+              description: "Categoría del insight"
+            confidence:
+              type: number
+              minimum: 0
+              maximum: 1
+              description: "Nivel de confianza en el insight"
+      sentiment_analysis:
+        type: object
+        properties:
+          overall_sentiment:
+            type: string
+            enum: ["positive", "neutral", "negative"]
+            description: "Sentimiento general de la reunión"
+          participant_sentiments:
+            type: array
+            items:
+              type: object
+              properties:
+                participant:
+                  type: string
+                sentiment:
+                  type: string
+                  enum: ["positive", "neutral", "negative"]
+                confidence:
+                  type: number
+                  minimum: 0
+                  maximum: 1
+          key_concerns:
+            type: array
+            items:
+              type: string
+            description: "Principales preocupaciones identificadas"
+
+# Policies
+policies:
+  mode: ["auto", "review", "approve"]
+  sla_seconds: 120
+  retry_attempts: 2
+  timeout_seconds: 300
+  approval_required: false
+
+# Tools and Integrations
+tools:
+  - crm.update
+  - calendar.schedule
+  - email.send
+  - task.create
+  - drive.upload
+
+# Observability
+observability:
+  metrics:
+    - latency_ms
+    - tokens_used
+    - summary_accuracy
+    - action_items_extracted
+  logs:
+    level: "info"
+    format: "structured"
+  alerts:
+    - high_latency
+    - low_accuracy
+    - missing_action_items
+
+# Business Rules
+business_rules:
+  summary_rules:
+    max_summary_length: 500
+    min_action_items: 1
+    max_action_items: 20
+    required_sections:
+      - "executive_summary"
+      - "key_decisions"
+      - "action_items"
+  
+  action_item_rules:
+    max_task_length: 200
+    required_fields: ["task", "owner", "due_date"]
+    default_priority: "medium"
+    max_due_date_days: 30
+  
+  sentiment_rules:
+    confidence_threshold: 0.7
+    alert_on_negative: true
+    track_sentiment_trends: true
+
+# Templates
+templates:
+  executive_summary:
+    template: |
+      ## Resumen Ejecutivo
+      
+      **Reunión**: {meeting_title}
+      **Fecha**: {meeting_date}
+      **Participantes**: {participants_list}
+      **Duración**: {duration_minutes} minutos
+      
+      {summary_content}
+      
+      **Decisiones Clave**: {key_decisions_count}
+      **Tareas Asignadas**: {action_items_count}
+      **Próxima Reunión**: {next_meeting_date}
+  
+  action_items:
+    template: |
+      ## Tareas Asignadas
+      
+      {action_items_list}
+      
+      **Total de tareas**: {total_tasks}
+      **Tareas críticas**: {critical_tasks}
+      **Vencen esta semana**: {due_this_week}
+
+# Examples
+examples:
+  input_example:
+    meeting_transcript: |
+      Carlos: Buenos días, gracias por estar aquí. Empecemos con el proyecto de automatización.
+      María: Perfecto, hemos avanzado con el análisis de procesos. Identificamos 3 áreas principales.
+      Carlos: Excelente, ¿cuáles son?
+      María: Primero, el proceso de ventas que actualmente toma 2 horas por lead. Segundo, la gestión de clientes que es manual. Tercero, los reportes que se generan semanalmente.
+      Carlos: Entiendo. ¿Cuál es el impacto estimado?
+      María: Podríamos reducir el tiempo de ventas en 70% y eliminar errores en gestión de clientes.
+      Carlos: Perfecto. ¿Cuándo podemos tener una propuesta?
+      María: Necesitamos 2 semanas para completar el análisis técnico y preparar la propuesta.
+      Carlos: Muy bien. Programemos una reunión para el 15 de marzo.
+      María: Perfecto, enviaré la invitación. También necesitamos acceso a su CRM para el análisis.
+      Carlos: Te daré acceso mañana. ¿Algo más?
+      María: No, eso es todo por ahora. Te envío el resumen por email.
+    
+    meeting_metadata:
+      title: "Reunión de Análisis - Proyecto Automatización"
+      date: "2025-03-01T10:00:00Z"
+      duration_minutes: 30
+      participants:
+        - name: "Carlos Rodríguez"
+          email: "carlos@innovate.cl"
+          role: "CEO"
+          company: "Innovate Solutions"
+        - name: "María González"
+          email: "maria@aiaiai.cl"
+          role: "Consultant"
+          company: "AIAIAI Consulting"
+      meeting_type: "client"
+      agenda:
+        - "Revisar avance del análisis"
+        - "Identificar áreas de automatización"
+        - "Definir próximos pasos"
+        - "Programar próxima reunión"
+    
+    context:
+      project_id: "PROJ-2025-001"
+      client_id: "CLIENT-001"
+      previous_meetings: ["MEET-2025-001"]
+      relevant_documents: ["ANALYSIS-001", "PROPOSAL-DRAFT-001"]
+  
+  output_example:
+    meeting_summary:
+      summary_id: "SUM-2025-001"
+      executive_summary: |
+        Reunión de análisis del proyecto de automatización con Innovate Solutions. Se identificaron 3 áreas principales 
+        de automatización: proceso de ventas (reducción 70% tiempo), gestión de clientes (eliminación errores), y 
+        generación de reportes. Se acordó completar análisis técnico en 2 semanas y presentar propuesta el 15 de marzo.
+        Se requiere acceso al CRM para análisis detallado.
+      
+      key_decisions:
+        - decision: "Completar análisis técnico en 2 semanas"
+          rationale: "Necesario para preparar propuesta detallada"
+          impact: "Permitirá presentar solución completa"
+          owner: "María González"
+        - decision: "Programar reunión para 15 de marzo"
+          rationale: "Presentar propuesta y discutir implementación"
+          impact: "Mantener momentum del proyecto"
+          owner: "María González"
+        - decision: "Proporcionar acceso al CRM"
+          rationale: "Requerido para análisis técnico detallado"
+          impact: "Permitirá análisis preciso de procesos"
+          owner: "Carlos Rodríguez"
+      
+      action_items:
+        - task: "Completar análisis técnico de procesos"
+          owner: "María González"
+          due_date: "2025-03-15"
+          priority: "high"
+          status: "pending"
+          dependencies: []
+        - task: "Preparar propuesta detallada"
+          owner: "María González"
+          due_date: "2025-03-15"
+          priority: "high"
+          status: "pending"
+          dependencies: ["Completar análisis técnico"]
+        - task: "Proporcionar acceso al CRM"
+          owner: "Carlos Rodríguez"
+          due_date: "2025-03-02"
+          priority: "high"
+          status: "pending"
+          dependencies: []
+        - task: "Enviar resumen de reunión por email"
+          owner: "María González"
+          due_date: "2025-03-01"
+          priority: "medium"
+          status: "pending"
+          dependencies: []
+        - task: "Enviar invitación para reunión del 15 de marzo"
+          owner: "María González"
+          due_date: "2025-03-01"
+          priority: "medium"
+          status: "pending"
+          dependencies: []
+      
+      next_meeting:
+        suggested_date: "2025-03-15"
+        agenda_items:
+          - "Presentar propuesta detallada"
+          - "Discutir timeline de implementación"
+          - "Definir recursos necesarios"
+          - "Acordar términos comerciales"
+        required_participants:
+          - "Carlos Rodríguez"
+          - "María González"
+      
+      insights:
+        - insight: "Cliente muestra alto interés en automatización de ventas"
+          category: "opportunity"
+          confidence: 0.9
+        - insight: "Proceso de ventas actual es ineficiente (2 horas por lead)"
+          category: "opportunity"
+          confidence: 0.95
+        - insight: "Cliente tiene urgencia en implementar soluciones"
+          category: "trend"
+          confidence: 0.8
+      
+      sentiment_analysis:
+        overall_sentiment: "positive"
+        participant_sentiments:
+          - participant: "Carlos Rodríguez"
+            sentiment: "positive"
+            confidence: 0.85
+          - participant: "María González"
+            sentiment: "positive"
+            confidence: 0.9
+        key_concerns:
+          - "Acceso a sistemas internos"
+          - "Timeline de implementación"

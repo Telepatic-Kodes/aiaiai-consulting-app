@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentes de IA - AIAIAI Consulting</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth.js"></script>
+    <script src="notifications.js"></script>
+    <script src="api.js"></script>
+    <script src="theme.js"></script>
+    <script src="search.js"></script>
+    <script src="shortcuts.js"></script>
+    <script src="animations.js"></script>
+    <script src="loading.js"></script>
+    <script src="accessibility.js"></script>
+    <script src="responsive.js"></script>
+    <script src="typography.js"></script>
+    <style>
+        /* Custom Agents Styles */
+        .agent-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            box-shadow: var(--shadow);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .agent-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        .agent-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-2xl);
+            color: white;
+        }
+
+        .agent-info h3 {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .agent-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .agent-status.active {
+            background: var(--success);
+            color: white;
+        }
+
+        .agent-status.beta {
+            background: var(--warning);
+            color: white;
+        }
+
+        .agent-status.development {
+            background: var(--error);
+            color: white;
+        }
+
+        .agent-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--space-4);
+            margin: var(--space-4) 0;
+        }
+
+        .metric {
+            text-align: center;
+            padding: var(--space-3);
+            background: var(--dark-50);
+            border-radius: var(--radius-md);
+        }
+
+        .metric-value {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .metric-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        .agent-actions {
+            display: flex;
+            gap: var(--space-3);
+            margin-top: var(--space-4);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-4);
+            color: white;
+            font-size: var(--font-size-xl);
+        }
+
+        .stat-value {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .stat-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        .filter-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            margin-bottom: var(--space-6);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: var(--space-4);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .filter-label {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+        }
+
+        .filter-select {
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--space-3) var(--space-4) var(--space-3) var(--space-10);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--space-3);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+        }
+
+        @media (max-width: 768px) {
+            .agent-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .agent-actions {
+                flex-direction: column;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="bg-surface border-b border-border sticky top-0 z-50">
+        <div class="container">
+            <nav class="flex items-center justify-between py-4">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">AI</span>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-primary">AIAIAI Consulting</h1>
+                        <p class="text-sm text-secondary">World-Class Engineering</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="dashboard.html" class="text-secondary hover:text-primary transition-colors">Dashboard</a>
+                    <a href="agents-new.html" class="text-primary font-medium border-b-2 border-primary pb-1">Agentes</a>
+                    <a href="clients.html" class="text-secondary hover:text-primary transition-colors">Clientes</a>
+                    <a href="projects.html" class="text-secondary hover:text-primary transition-colors">Proyectos</a>
+                    <a href="reports.html" class="text-secondary hover:text-primary transition-colors">Reportes</a>
+                </div>
+
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 text-secondary hover:text-primary transition-colors" title="Búsqueda Global (Ctrl+K)">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                    <button class="p-2 text-secondary hover:text-primary transition-colors" title="Cambiar Tema">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-medium">A</span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container py-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-primary mb-4">Agentes de IA</h1>
+            <p class="text-xl text-secondary">Gestiona y monitorea tus agentes de inteligencia artificial especializados</p>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card animate-slideInUp">
+                <div class="stat-icon">🤖</div>
+                <div class="stat-value">6</div>
+                <div class="stat-label">Agentes Totales</div>
+            </div>
+            <div class="stat-card animate-slideInUp" style="animation-delay: 0.1s;">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-value">4</div>
+                <div class="stat-label">Activos</div>
+            </div>
+            <div class="stat-card animate-slideInUp" style="animation-delay: 0.2s;">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value">3,833</div>
+                <div class="stat-label">Tareas Completadas</div>
+            </div>
+            <div class="stat-card animate-slideInUp" style="animation-delay: 0.3s;">
+                <div class="stat-icon">⏱️</div>
+                <div class="stat-value">100h</div>
+                <div class="stat-label">Tiempo Ahorrado</div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-controls">
+                <div class="search-box">
+                    <svg class="w-5 h-5 search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" class="search-input" placeholder="Buscar agentes...">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Estado</label>
+                    <select class="filter-select">
+                        <option value="">Todos</option>
+                        <option value="active">Activos</option>
+                        <option value="beta">Beta</option>
+                        <option value="development">En Desarrollo</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Categoría</label>
+                    <select class="filter-select">
+                        <option value="">Todas</option>
+                        <option value="sales">Ventas</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="operations">Operaciones</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary">Filtrar</button>
+            </div>
+        </div>
+
+        <!-- Agents Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Lead Scorer -->
+            <div class="agent-card animate-slideInLeft">
+                <div class="agent-header">
+                    <div class="agent-icon">📊</div>
+                    <div class="agent-info">
+                        <h3>Lead Scorer</h3>
+                        <span class="agent-status active">Activo</span>
+                    </div>
+                </div>
+                <p class="text-secondary mb-4">Califica automáticamente tus leads y prioriza los más valiosos para tu equipo de ventas.</p>
+                <div class="agent-metrics">
+                    <div class="metric">
+                        <div class="metric-value">85%</div>
+                        <div class="metric-label">Precisión</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">1,247</div>
+                        <div class="metric-label">Leads</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">20h</div>
+                        <div class="metric-label">Ahorrado</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">$49</div>
+                        <div class="metric-label">Precio/mes</div>
+                    </div>
+                </div>
+                <div class="agent-actions">
+                    <button class="btn btn-primary flex-1">Configurar</button>
+                    <button class="btn btn-outline">Ver Logs</button>
+                </div>
+            </div>
+
+            <!-- Proposal Builder -->
+            <div class="agent-card animate-slideInRight">
+                <div class="agent-header">
+                    <div class="agent-icon">📝</div>
+                    <div class="agent-info">
+                        <h3>Proposal Builder</h3>
+                        <span class="agent-status active">Activo</span>
+                    </div>
+                </div>
+                <p class="text-secondary mb-4">Genera propuestas profesionales en 5 minutos en lugar de 2 horas de trabajo manual.</p>
+                <div class="agent-metrics">
+                    <div class="metric">
+                        <div class="metric-value">95%</div>
+                        <div class="metric-label">Precisión</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">89</div>
+                        <div class="metric-label">Propuestas</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">40h</div>
+                        <div class="metric-label">Ahorrado</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">$79</div>
+                        <div class="metric-label">Precio/mes</div>
+                    </div>
+                </div>
+                <div class="agent-actions">
+                    <button class="btn btn-primary flex-1">Configurar</button>
+                    <button class="btn btn-outline">Ver Logs</button>
+                </div>
+            </div>
+
+            <!-- Meeting Summarizer -->
+            <div class="agent-card animate-slideInLeft" style="animation-delay: 0.1s;">
+                <div class="agent-header">
+                    <div class="agent-icon">🎯</div>
+                    <div class="agent-info">
+                        <h3>Meeting Summarizer</h3>
+                        <span class="agent-status active">Activo</span>
+                    </div>
+                </div>
+                <p class="text-secondary mb-4">Convierte reuniones en acciones concretas con resúmenes y tareas automáticas.</p>
+                <div class="agent-metrics">
+                    <div class="metric">
+                        <div class="metric-value">88%</div>
+                        <div class="metric-label">Precisión</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">156</div>
+                        <div class="metric-label">Reuniones</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">15h</div>
+                        <div class="metric-label">Ahorrado</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">$39</div>
+                        <div class="metric-label">Precio/mes</div>
+                    </div>
+                </div>
+                <div class="agent-actions">
+                    <button class="btn btn-primary flex-1">Configurar</button>
+                    <button class="btn btn-outline">Ver Logs</button>
+                </div>
+            </div>
+
+            <!-- CRM Updater -->
+            <div class="agent-card animate-slideInRight" style="animation-delay: 0.1s;">
+                <div class="agent-header">
+                    <div class="agent-icon">🔄</div>
+                    <div class="agent-info">
+                        <h3>CRM Updater</h3>
+                        <span class="agent-status beta">Beta</span>
+                    </div>
+                </div>
+                <p class="text-secondary mb-4">Mantén tu base de datos siempre actualizada con sincronización automática.</p>
+                <div class="agent-metrics">
+                    <div class="metric">
+                        <div class="metric-value">92%</div>
+                        <div class="metric-label">Precisión</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">2,341</div>
+                        <div class="metric-label">Registros</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">25h</div>
+                        <div class="metric-label">Ahorrado</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">$59</div>
+                        <div class="metric-label">Precio/mes</div>
+                    </div>
+                </div>
+                <div class="agent-actions">
+                    <button class="btn btn-primary flex-1">Configurar</button>
+                    <button class="btn btn-outline">Ver Logs</button>
+                </div>
+            </div>
+
+            <!-- Follow-up Scheduler -->
+            <div class="agent-card animate-slideInLeft" style="animation-delay: 0.2s;">
+                <div class="agent-header">
+                    <div class="agent-icon">📅</div>
+                    <div class="agent-info">
+                        <h3>Follow-up Scheduler</h3>
+                        <span class="agent-status development">En Desarrollo</span>
+                    </div>
+                </div>
+                <p class="text-secondary mb-4">Automatiza seguimientos y agendamiento para nunca perder una oportunidad.</p>
+                <div class="agent-metrics">
+                    <div class="metric">
+                        <div class="metric-value">90%</div>
+                        <div class="metric-label">Precisión</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">0</div>
+                        <div class="metric-label">Seguimientos</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">0h</div>
+                        <div class="metric-label">Ahorrado</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">$49</div>
+                        <div class="metric-label">Precio/mes</div>
+                    </div>
+                </div>
+                <div class="agent-actions">
+                    <button class="btn btn-primary flex-1" disabled>Configurar</button>
+                    <button class="btn btn-outline" disabled>Ver Logs</button>
+                </div>
+            </div>
+
+            <!-- Invoice Generator -->
+            <div class="agent-card animate-slideInRight" style="animation-delay: 0.2s;">
+                <div class="agent-header">
+                    <div class="agent-icon">💰</div>
+                    <div class="agent-info">
+                        <h3>Invoice Generator</h3>
+                        <span class="agent-status development">En Desarrollo</span>
+                    </div>
+                </div>
+                <p class="text-secondary mb-4">Genera facturas y boletas automáticamente con la información de tus proyectos.</p>
+                <div class="agent-metrics">
+                    <div class="metric">
+                        <div class="metric-value">0%</div>
+                        <div class="metric-label">Precisión</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">0</div>
+                        <div class="metric-label">Facturas</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">0h</div>
+                        <div class="metric-label">Ahorrado</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">$39</div>
+                        <div class="metric-label">Precio/mes</div>
+                    </div>
+                </div>
+                <div class="agent-actions">
+                    <button class="btn btn-primary flex-1" disabled>Configurar</button>
+                    <button class="btn btn-outline" disabled>Ver Logs</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="text-center py-12 bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl mt-12">
+            <h2 class="text-3xl font-bold mb-4">¿Necesitas un Agente Personalizado?</h2>
+            <p class="text-xl text-secondary mb-8">Desarrollamos agentes de IA específicos para tu industria y procesos de negocio</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="btn btn-primary btn-lg">Solicitar Agente</button>
+                <button class="btn btn-outline btn-lg">Ver Documentación</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-8 mt-16">
+        <div class="container">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold">AI</span>
+                        </div>
+                        <span class="font-bold">AIAIAI Consulting</span>
+                    </div>
+                    <p class="text-gray-400">Consultoría de clase mundial para emprendedores LATAM</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Producto</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Agentes IA</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Analytics</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Integraciones</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Soporte</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Documentación</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contacto</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Estado del Sistema</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Empresa</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Acerca de</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Carreras</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacidad</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 AIAIAI Consulting. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

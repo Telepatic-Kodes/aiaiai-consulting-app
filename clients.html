@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Clientes - AIAIAI Consulting</title>
+    <script src="auth.js"></script>
+    <script src="notifications.js"></script>
+    <script src="api.js"></script>
+    <script src="theme.js"></script>
+    <script src="search.js"></script>
+    <script src="shortcuts.js"></script>
+    <script src="animations.js"></script>
+    <script src="loading.js"></script>
+    <script src="accessibility.js"></script>
+    <script src="responsive.js"></script>
+    <script src="typography.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #3A86FF;
+            --accent: #FFD700;
+            --dark: #1f2937;
+            --light: #f8f9fa;
+            --gray: #6b7280;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--light);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .nav-links a.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main {
+            margin-top: 80px;
+            padding: 2rem 0;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .page-title p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Filters and Search */
+        .filters-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .filters-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Clients Grid */
+        .clients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .client-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .client-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        .client-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .client-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .client-info h3 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+        
+        .client-company {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+        
+        .client-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: auto;
+        }
+        
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-prospect {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .client-details {
+            margin-bottom: 1rem;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .detail-label {
+            color: var(--gray);
+        }
+        
+        .detail-value {
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .client-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+        
+        .client-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+        
+        /* Client Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .close:hover {
+            color: var(--dark);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-group-full {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group-full label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-group-full input,
+        .form-group-full select,
+        .form-group-full textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-group-full input:focus,
+        .form-group-full select:focus,
+        .form-group-full textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .filters-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .clients-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">
+                    <div class="logo-icon">AI</div>
+                    <span>AIAIAI Consulting</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="agents.html">Agentes</a></li>
+                    <li><a href="clients.html" class="active">Clientes</a></li>
+                    <li><a href="projects.html">Proyectos</a></li>
+                    <li><a href="reports.html">Reportes</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header fade-in-up">
+                <div class="page-title">
+                    <h1>Gestión de Clientes</h1>
+                    <p>Administra y monitorea tus clientes y prospectos</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn btn-secondary" onclick="exportClients()">Exportar</button>
+                    <button class="btn btn-primary" onclick="openClientModal()">Nuevo Cliente</button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid fade-in-up">
+                <div class="stat-card">
+                    <div class="stat-value">24</div>
+                    <div class="stat-label">Clientes Activos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Prospectos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">$172K</div>
+                    <div class="stat-label">Revenue Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">4.7</div>
+                    <div class="stat-label">Satisfacción Promedio</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-section fade-in-up">
+                <div class="filters-row">
+                    <div class="form-group">
+                        <label>Buscar</label>
+                        <input type="text" id="searchInput" placeholder="Nombre, empresa, email...">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="statusFilter">
+                            <option value="">Todos</option>
+                            <option value="active">Activo</option>
+                            <option value="prospect">Prospecto</option>
+                            <option value="inactive">Inactivo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Industria</label>
+                        <select id="industryFilter">
+                            <option value="">Todas</option>
+                            <option value="technology">Tecnología</option>
+                            <option value="finance">Finanzas</option>
+                            <option value="healthcare">Salud</option>
+                            <option value="retail">Retail</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ordenar por</label>
+                        <select id="sortFilter">
+                            <option value="name">Nombre</option>
+                            <option value="company">Empresa</option>
+                            <option value="revenue">Revenue</option>
+                            <option value="lastContact">Último Contacto</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="applyFilters()">Filtrar</button>
+                </div>
+            </div>
+
+            <!-- Clients Grid -->
+            <div class="clients-grid" id="clientsGrid">
+                <!-- Client cards will be generated by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Client Modal -->
+    <div id="clientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nuevo Cliente</h2>
+                <button class="close" onclick="closeClientModal()">&times;</button>
+            </div>
+            <form id="clientForm">
+                <div class="form-row">
+                    <div class="form-group-full">
+                        <label>Nombre Completo *</label>
+                        <input type="text" id="clientName" required>
+                    </div>
+                    <div class="form-group-full">
+                        <label>Email *</label>
+                        <input type="email" id="clientEmail" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group-full">
+                        <label>Empresa *</label>
+                        <input type="text" id="clientCompany" required>
+                    </div>
+                    <div class="form-group-full">
+                        <label>Teléfono</label>
+                        <input type="tel" id="clientPhone">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group-full">
+                        <label>Cargo</label>
+                        <input type="text" id="clientRole">
+                    </div>
+                    <div class="form-group-full">
+                        <label>Industria</label>
+                        <select id="clientIndustry">
+                            <option value="">Seleccionar...</option>
+                            <option value="technology">Tecnología</option>
+                            <option value="finance">Finanzas</option>
+                            <option value="healthcare">Salud</option>
+                            <option value="retail">Retail</option>
+                            <option value="manufacturing">Manufactura</option>
+                            <option value="services">Servicios</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group-full">
+                        <label>Tamaño de Empresa</label>
+                        <select id="clientSize">
+                            <option value="">Seleccionar...</option>
+                            <option value="startup">Startup (1-10)</option>
+                            <option value="small">Pequeña (11-50)</option>
+                            <option value="medium">Mediana (51-200)</option>
+                            <option value="large">Grande (200+)</option>
+                        </select>
+                    </div>
+                    <div class="form-group-full">
+                        <label>Estado</label>
+                        <select id="clientStatus">
+                            <option value="prospect">Prospecto</option>
+                            <option value="active">Activo</option>
+                            <option value="inactive">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group-full">
+                    <label>Notas</label>
+                    <textarea id="clientNotes" rows="3" placeholder="Información adicional sobre el cliente..."></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeClientModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample client data
+        const clients = [
+            {
+                id: 1,
+                name: "María González",
+                email: "maria@techcorp.cl",
+                company: "TechCorp Chile",
+                phone: "+56 9 1234 5678",
+                role: "CTO",
+                industry: "technology",
+                size: "medium",
+                status: "active",
+                revenue: 25000,
+                projects: 3,
+                satisfaction: 4.8,
+                lastContact: "2025-01-05",
+                notes: "Cliente muy satisfecho con los agentes implementados"
+            },
+            {
+                id: 2,
+                name: "Carlos Rodríguez",
+                email: "carlos@innovate.cl",
+                company: "Innovate Solutions",
+                phone: "+56 9 2345 6789",
+                role: "CEO",
+                industry: "technology",
+                size: "small",
+                status: "active",
+                revenue: 15000,
+                projects: 2,
+                satisfaction: 4.6,
+                lastContact: "2025-01-04",
+                notes: "Interesado en expandir el uso de agentes"
+            },
+            {
+                id: 3,
+                name: "Ana Silva",
+                email: "ana@retailmax.cl",
+                company: "RetailMax",
+                phone: "+56 9 3456 7890",
+                role: "Gerente General",
+                industry: "retail",
+                size: "large",
+                status: "active",
+                revenue: 45000,
+                projects: 5,
+                satisfaction: 4.9,
+                lastContact: "2025-01-06",
+                notes: "Cliente premium, muy comprometido con la automatización"
+            },
+            {
+                id: 4,
+                name: "Roberto Martínez",
+                email: "roberto@startup.cl",
+                company: "StartupLatam",
+                phone: "+56 9 4567 8901",
+                role: "Fundador",
+                industry: "technology",
+                size: "startup",
+                status: "prospect",
+                revenue: 0,
+                projects: 0,
+                satisfaction: 0,
+                lastContact: "2025-01-03",
+                notes: "Prospecto interesado en Lead Scorer"
+            },
+            {
+                id: 5,
+                name: "Laura Fernández",
+                email: "laura@finance.cl",
+                company: "FinancePro",
+                phone: "+56 9 5678 9012",
+                role: "Directora de Operaciones",
+                industry: "finance",
+                size: "medium",
+                status: "active",
+                revenue: 32000,
+                projects: 4,
+                satisfaction: 4.7,
+                lastContact: "2025-01-05",
+                notes: "Excelente relación comercial"
+            },
+            {
+                id: 6,
+                name: "Diego Herrera",
+                email: "diego@healthcare.cl",
+                company: "HealthTech",
+                phone: "+56 9 6789 0123",
+                role: "Director de TI",
+                industry: "healthcare",
+                size: "large",
+                status: "prospect",
+                revenue: 0,
+                projects: 0,
+                satisfaction: 0,
+                lastContact: "2025-01-02",
+                notes: "Evaluando propuesta para Meeting Summarizer"
+            }
+        ];
+
+        let filteredClients = [...clients];
+
+        function renderClients() {
+            const grid = document.getElementById('clientsGrid');
+            grid.innerHTML = '';
+
+            filteredClients.forEach(client => {
+                const card = createClientCard(client);
+                grid.appendChild(card);
+            });
+        }
+
+        function createClientCard(client) {
+            const card = document.createElement('div');
+            card.className = 'client-card fade-in-up';
+            
+            const statusClass = `status-${client.status}`;
+            const statusText = {
+                'active': 'Activo',
+                'prospect': 'Prospecto',
+                'inactive': 'Inactivo'
+            }[client.status];
+
+            const industryText = {
+                'technology': 'Tecnología',
+                'finance': 'Finanzas',
+                'healthcare': 'Salud',
+                'retail': 'Retail',
+                'manufacturing': 'Manufactura',
+                'services': 'Servicios'
+            }[client.industry] || client.industry;
+
+            const sizeText = {
+                'startup': 'Startup',
+                'small': 'Pequeña',
+                'medium': 'Mediana',
+                'large': 'Grande'
+            }[client.size] || client.size;
+
+            card.innerHTML = `
+                <div class="client-header">
+                    <div class="client-avatar">${client.name.split(' ').map(n => n[0]).join('')}</div>
+                    <div class="client-info">
+                        <h3>${client.name}</h3>
+                        <div class="client-company">${client.company}</div>
+                    </div>
+                    <span class="client-status ${statusClass}">${statusText}</span>
+                </div>
+                
+                <div class="client-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">${client.email}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Cargo:</span>
+                        <span class="detail-value">${client.role}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Industria:</span>
+                        <span class="detail-value">${industryText}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Tamaño:</span>
+                        <span class="detail-value">${sizeText}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Último Contacto:</span>
+                        <span class="detail-value">${formatDate(client.lastContact)}</span>
+                    </div>
+                </div>
+                
+                <div class="client-metrics">
+                    <div class="metric">
+                        <div class="metric-value">$${client.revenue.toLocaleString()}</div>
+                        <div class="metric-label">Revenue</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${client.projects}</div>
+                        <div class="metric-label">Proyectos</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${client.satisfaction || 'N/A'}</div>
+                        <div class="metric-label">Satisfacción</div>
+                    </div>
+                </div>
+                
+                <div class="client-actions">
+                    <button class="btn btn-primary btn-sm" onclick="editClient(${client.id})">Editar</button>
+                    <button class="btn btn-secondary btn-sm" onclick="viewClientDetails(${client.id})">Ver Detalles</button>
+                    <button class="btn btn-secondary btn-sm" onclick="contactClient(${client.id})">Contactar</button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-CL');
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const industry = document.getElementById('industryFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+
+            filteredClients = clients.filter(client => {
+                const matchesSearch = !search || 
+                    client.name.toLowerCase().includes(search) ||
+                    client.company.toLowerCase().includes(search) ||
+                    client.email.toLowerCase().includes(search);
+                
+                const matchesStatus = !status || client.status === status;
+                const matchesIndustry = !industry || client.industry === industry;
+
+                return matchesSearch && matchesStatus && matchesIndustry;
+            });
+
+            // Sort clients
+            filteredClients.sort((a, b) => {
+                switch (sort) {
+                    case 'name':
+                        return a.name.localeCompare(b.name);
+                    case 'company':
+                        return a.company.localeCompare(b.company);
+                    case 'revenue':
+                        return b.revenue - a.revenue;
+                    case 'lastContact':
+                        return new Date(b.lastContact) - new Date(a.lastContact);
+                    default:
+                        return 0;
+                }
+            });
+
+            renderClients();
+        }
+
+        function openClientModal(clientId = null) {
+            const modal = document.getElementById('clientModal');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('clientForm');
+
+            if (clientId) {
+                const client = clients.find(c => c.id === clientId);
+                if (client) {
+                    title.textContent = 'Editar Cliente';
+                    populateForm(client);
+                }
+            } else {
+                title.textContent = 'Nuevo Cliente';
+                form.reset();
+            }
+
+            modal.style.display = 'block';
+        }
+
+        function closeClientModal() {
+            document.getElementById('clientModal').style.display = 'none';
+        }
+
+        function populateForm(client) {
+            document.getElementById('clientName').value = client.name;
+            document.getElementById('clientEmail').value = client.email;
+            document.getElementById('clientCompany').value = client.company;
+            document.getElementById('clientPhone').value = client.phone;
+            document.getElementById('clientRole').value = client.role;
+            document.getElementById('clientIndustry').value = client.industry;
+            document.getElementById('clientSize').value = client.size;
+            document.getElementById('clientStatus').value = client.status;
+            document.getElementById('clientNotes').value = client.notes;
+        }
+
+        function editClient(clientId) {
+            openClientModal(clientId);
+        }
+
+        function viewClientDetails(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            if (client) {
+                alert(`Detalles de ${client.name}:\n\nEmpresa: ${client.company}\nEmail: ${client.email}\nTeléfono: ${client.phone}\nCargo: ${client.role}\nIndustria: ${client.industry}\nTamaño: ${client.size}\nEstado: ${client.status}\nRevenue: $${client.revenue.toLocaleString()}\nProyectos: ${client.projects}\nSatisfacción: ${client.satisfaction}\nÚltimo Contacto: ${formatDate(client.lastContact)}\n\nNotas: ${client.notes}`);
+            }
+        }
+
+        function contactClient(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            if (client) {
+                const choice = confirm(`¿Cómo quieres contactar a ${client.name}?\n\nOK para email\nCancelar para teléfono`);
+                if (choice) {
+                    window.open(`mailto:${client.email}`);
+                } else {
+                    window.open(`tel:${client.phone}`);
+                }
+            }
+        }
+
+        function exportClients() {
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "Nombre,Email,Empresa,Teléfono,Cargo,Industria,Tamaño,Estado,Revenue,Proyectos,Satisfacción,Último Contacto\n" +
+                filteredClients.map(client => 
+                    `${client.name},${client.email},${client.company},${client.phone},${client.role},${client.industry},${client.size},${client.status},${client.revenue},${client.projects},${client.satisfaction},${client.lastContact}`
+                ).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "clientes_aiaiai.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Form submission
+        document.getElementById('clientForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('clientName').value,
+                email: document.getElementById('clientEmail').value,
+                company: document.getElementById('clientCompany').value,
+                phone: document.getElementById('clientPhone').value,
+                role: document.getElementById('clientRole').value,
+                industry: document.getElementById('clientIndustry').value,
+                size: document.getElementById('clientSize').value,
+                status: document.getElementById('clientStatus').value,
+                notes: document.getElementById('clientNotes').value
+            };
+
+            // Simulate saving
+            notificationManager.success('Cliente Guardado', 
+                `El cliente ${formData.name} ha sido guardado exitosamente.`);
+            
+            // Dispatch custom event
+            document.dispatchEvent(new CustomEvent('client-added', {
+                detail: { clientName: formData.name, clientEmail: formData.email }
+            }));
+            
+            closeClientModal();
+            
+            // In a real app, you would send this data to your API
+            console.log('Client data:', formData);
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('clientModal');
+            if (event.target === modal) {
+                closeClientModal();
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderClients();
+            console.log('AIAIAI Consulting - Clients Management loaded');
+        });
+    </script>
+</body>
+</html>

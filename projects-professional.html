@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management - AIAIAI Consulting</title>
+    <link rel="stylesheet" href="styles-professional.css">
+    <script src="auth.js"></script>
+    <script src="notifications.js"></script>
+    <script src="api.js"></script>
+    <script src="theme.js"></script>
+    <script src="search.js"></script>
+    <script src="shortcuts.js"></script>
+    <script src="animations.js"></script>
+    <script src="loading.js"></script>
+    <script src="accessibility.js"></script>
+    <script src="responsive.js"></script>
+    <script src="typography.js"></script>
+    <style>
+        /* Professional Project Styles */
+        .project-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-600);
+        }
+
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--border-secondary);
+        }
+
+        .project-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: var(--space-6);
+        }
+
+        .project-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .project-client {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-2);
+        }
+
+        .project-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: var(--font-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .project-status.active {
+            background: var(--success-100);
+            color: var(--success-700);
+        }
+
+        .project-status.pending {
+            background: var(--warning-100);
+            color: var(--warning-700);
+        }
+
+        .project-status.completed {
+            background: var(--primary-100);
+            color: var(--primary-700);
+        }
+
+        .project-status.on-hold {
+            background: var(--error-100);
+            color: var(--error-700);
+        }
+
+        .project-progress {
+            margin: var(--space-6) 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--neutral-200);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-bottom: var(--space-2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-600);
+            border-radius: var(--radius-full);
+            transition: width var(--transition-normal);
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: between;
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .project-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--space-4);
+            margin: var(--space-6) 0;
+        }
+
+        .detail-item {
+            text-align: center;
+            padding: var(--space-4);
+            background: var(--neutral-50);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-primary);
+        }
+
+        .detail-value {
+            font-size: var(--text-lg);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .detail-label {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: var(--space-3);
+            margin-top: var(--space-6);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-12);
+        }
+
+        .stat-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            transition: all var(--transition-normal);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-100);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-4);
+            color: var(--primary-600);
+        }
+
+        .stat-value {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .stat-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .filter-bar {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            margin-bottom: var(--space-8);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: var(--space-4);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .filter-label {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        .filter-select {
+            padding: var(--space-3) var(--space-4);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--space-3) var(--space-4) var(--space-3) var(--space-10);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--space-3);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .timeline {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-12);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: var(--space-4);
+            padding: var(--space-4) 0;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-marker {
+            width: 12px;
+            height: 12px;
+            background: var(--primary-600);
+            border-radius: var(--radius-full);
+            margin-top: var(--space-2);
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .timeline-date {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        @media (max-width: 768px) {
+            .project-details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .project-actions {
+                flex-direction: column;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+            
+            .action-bar {
+                flex-direction: column;
+                gap: var(--space-4);
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Professional Navigation Header -->
+    <header class="bg-surface border-b border-primary sticky top-0 z-50">
+        <div class="container">
+            <nav class="flex items-center justify-between py-4">
+                <!-- Professional Logo -->
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">AI</span>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-semibold text-primary">AIAIAI Consulting</h1>
+                        <p class="text-xs text-secondary">Executive Platform</p>
+                    </div>
+                </div>
+
+                <!-- Professional Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="dashboard-professional.html" class="text-secondary hover:text-primary transition-colors">Dashboard</a>
+                    <a href="agents-professional.html" class="text-secondary hover:text-primary transition-colors">Agents</a>
+                    <a href="clients-professional.html" class="text-secondary hover:text-primary transition-colors">Clients</a>
+                    <a href="projects-professional.html" class="text-primary font-medium border-b-2 border-primary pb-1">Projects</a>
+                    <a href="reports-professional.html" class="text-secondary hover:text-primary transition-colors">Analytics</a>
+                </div>
+
+                <!-- Professional User Menu -->
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 text-secondary hover:text-primary transition-colors" title="Global Search">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                    <button class="p-2 text-secondary hover:text-primary transition-colors" title="Theme Toggle">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-medium">A</span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container py-8">
+        <!-- Page Header -->
+        <div class="mb-12">
+            <h1 class="text-4xl font-bold text-primary mb-4">Project Management</h1>
+            <p class="text-xl text-secondary">Monitor and manage all your consulting projects</p>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card animate-slideInUp">
+                <div class="stat-icon">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                </div>
+                <div class="stat-value">12</div>
+                <div class="stat-label">Active Projects</div>
+            </div>
+            <div class="stat-card animate-slideInUp" style="animation-delay: 0.1s;">
+                <div class="stat-icon">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="stat-value">8</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card animate-slideInUp" style="animation-delay: 0.2s;">
+                <div class="stat-icon">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                    </svg>
+                </div>
+                <div class="stat-value">$172K</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+            <div class="stat-card animate-slideInUp" style="animation-delay: 0.3s;">
+                <div class="stat-icon">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="stat-value">87%</div>
+                <div class="stat-label">Avg Time</div>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <div class="flex gap-4">
+                <button class="btn btn-primary">New Project</button>
+                <button class="btn btn-outline">Export</button>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-controls">
+                <div class="search-box">
+                    <svg class="w-5 h-5 search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" class="search-input" placeholder="Search projects...">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select class="filter-select">
+                        <option value="">All</option>
+                        <option value="active">Active</option>
+                        <option value="pending">Pending</option>
+                        <option value="completed">Completed</option>
+                        <option value="on-hold">On Hold</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Client</label>
+                    <select class="filter-select">
+                        <option value="">All</option>
+                        <option value="maria">María González</option>
+                        <option value="carlos">Carlos Rodríguez</option>
+                        <option value="ana">Ana Silva</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Sort by</label>
+                    <select class="filter-select">
+                        <option value="deadline">Deadline</option>
+                        <option value="progress">Progress</option>
+                        <option value="value">Value</option>
+                        <option value="name">Name</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+
+        <!-- Projects Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- CRM Implementation -->
+            <div class="project-card animate-slideInLeft">
+                <div class="project-header">
+                    <div>
+                        <h3 class="project-title">CRM Implementation</h3>
+                        <div class="project-client">TechCorp Chile - María González</div>
+                        <span class="project-status active">Active</span>
+                    </div>
+                </div>
+                <div class="project-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span>75% Complete</span>
+                        <span>15 of 20 tasks</span>
+                    </div>
+                </div>
+                <div class="project-details">
+                    <div class="detail-item">
+                        <div class="detail-value">$25,000</div>
+                        <div class="detail-label">Value</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">15/02</div>
+                        <div class="detail-label">Deadline</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">3</div>
+                        <div class="detail-label">Members</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">45d</div>
+                        <div class="detail-label">Duration</div>
+                    </div>
+                </div>
+                <div class="project-actions">
+                    <button class="btn btn-primary flex-1">Edit</button>
+                    <button class="btn btn-outline">View Details</button>
+                    <button class="btn btn-outline">Timeline</button>
+                </div>
+            </div>
+
+            <!-- Process Optimization -->
+            <div class="project-card animate-slideInRight">
+                <div class="project-header">
+                    <div>
+                        <h3 class="project-title">Process Optimization</h3>
+                        <div class="project-client">Innovate Solutions - Carlos Rodríguez</div>
+                        <span class="project-status active">Active</span>
+                    </div>
+                </div>
+                <div class="project-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span>60% Complete</span>
+                        <span>12 of 20 tasks</span>
+                    </div>
+                </div>
+                <div class="project-details">
+                    <div class="detail-item">
+                        <div class="detail-value">$15,000</div>
+                        <div class="detail-label">Value</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">28/02</div>
+                        <div class="detail-label">Deadline</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">2</div>
+                        <div class="detail-label">Members</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">60d</div>
+                        <div class="detail-label">Duration</div>
+                    </div>
+                </div>
+                <div class="project-actions">
+                    <button class="btn btn-primary flex-1">Edit</button>
+                    <button class="btn btn-outline">View Details</button>
+                    <button class="btn btn-outline">Timeline</button>
+                </div>
+            </div>
+
+            <!-- Digital Strategy -->
+            <div class="project-card animate-slideInLeft" style="animation-delay: 0.1s;">
+                <div class="project-header">
+                    <div>
+                        <h3 class="project-title">Digital Strategy</h3>
+                        <div class="project-client">RetailMax - Ana Silva</div>
+                        <span class="project-status completed">Completed</span>
+                    </div>
+                </div>
+                <div class="project-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span>100% Complete</span>
+                        <span>25 of 25 tasks</span>
+                    </div>
+                </div>
+                <div class="project-details">
+                    <div class="detail-item">
+                        <div class="detail-value">$45,000</div>
+                        <div class="detail-label">Value</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">15/01</div>
+                        <div class="detail-label">Completed</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">4</div>
+                        <div class="detail-label">Members</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">90d</div>
+                        <div class="detail-label">Duration</div>
+                    </div>
+                </div>
+                <div class="project-actions">
+                    <button class="btn btn-primary flex-1">Edit</button>
+                    <button class="btn btn-outline">View Details</button>
+                    <button class="btn btn-outline">Timeline</button>
+                </div>
+            </div>
+
+            <!-- Financial Analysis -->
+            <div class="project-card animate-slideInRight" style="animation-delay: 0.1s;">
+                <div class="project-header">
+                    <div>
+                        <h3 class="project-title">Financial Analysis</h3>
+                        <div class="project-client">FinancePro - Laura Fernández</div>
+                        <span class="project-status pending">Pending</span>
+                    </div>
+                </div>
+                <div class="project-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span>30% Complete</span>
+                        <span>6 of 20 tasks</span>
+                    </div>
+                </div>
+                <div class="project-details">
+                    <div class="detail-item">
+                        <div class="detail-value">$32,000</div>
+                        <div class="detail-label">Value</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">10/03</div>
+                        <div class="detail-label">Deadline</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">3</div>
+                        <div class="detail-label">Members</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">75d</div>
+                        <div class="detail-label">Duration</div>
+                    </div>
+                </div>
+                <div class="project-actions">
+                    <button class="btn btn-primary flex-1">Edit</button>
+                    <button class="btn btn-outline">View Details</button>
+                    <button class="btn btn-outline">Timeline</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Timeline -->
+        <div class="timeline">
+            <h3 class="text-lg font-semibold mb-6">Recent Activity</h3>
+            <div class="space-y-4">
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Project "Digital Strategy" completed</div>
+                        <div class="timeline-date">2 hours ago</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">New task added to "CRM Implementation"</div>
+                        <div class="timeline-date">4 hours ago</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Progress updated on "Process Optimization"</div>
+                        <div class="timeline-date">6 hours ago</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">New project "Financial Analysis" started</div>
+                        <div class="timeline-date">1 day ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="text-center py-16 bg-neutral-50 rounded-2xl mt-16">
+            <h2 class="text-3xl font-semibold mb-4">Need to Manage Projects More Efficiently?</h2>
+            <p class="text-xl text-secondary mb-8 max-w-2xl mx-auto">Our AI agents can automate project tracking and management processes</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="btn btn-primary btn-lg">Create Project</button>
+                <button class="btn btn-outline btn-lg">View Templates</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Professional Footer -->
+    <footer class="bg-neutral-900 text-white py-12 mt-20">
+        <div class="container">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold">AI</span>
+                        </div>
+                        <span class="font-semibold">AIAIAI Consulting</span>
+                    </div>
+                    <p class="text-neutral-400">World-class consulting for LATAM entrepreneurs</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-neutral-400">
+                        <li><a href="#" class="hover:text-white transition-colors">AI Agents</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Analytics</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Integrations</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-neutral-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">System Status</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-neutral-400">
+                        <li><a href="#" class="hover:text-white transition-colors">About</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-neutral-700 mt-8 pt-8 text-center text-neutral-400">
+                <p>&copy; 2025 AIAIAI Consulting. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

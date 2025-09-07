@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentes de IA - AIAIAI Consulting</title>
+    <script src="auth.js"></script>
+    <script src="notifications.js"></script>
+    <script src="api.js"></script>
+    <script src="theme.js"></script>
+    <script src="search.js"></script>
+    <script src="shortcuts.js"></script>
+    <script src="animations.js"></script>
+    <script src="loading.js"></script>
+    <script src="accessibility.js"></script>
+    <script src="responsive.js"></script>
+    <script src="typography.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #3A86FF;
+            --accent: #FFD700;
+            --dark: #1f2937;
+            --light: #f8f9fa;
+            --gray: #6b7280;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--light);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .nav-links a.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main {
+            margin-top: 80px;
+            padding: 2rem 0;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .page-header p {
+            font-size: 1.25rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Agent Grid */
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .agent-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .agent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        .agent-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .agent-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .agent-info h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .agent-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-beta {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-development {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .agent-description {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .agent-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+        
+        .agent-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Agent Details Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .close:hover {
+            color: var(--dark);
+        }
+        
+        /* Agent Configuration */
+        .config-section {
+            margin-bottom: 2rem;
+        }
+        
+        .config-section h3 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Agent Logs */
+        .logs-container {
+            background: #1f2937;
+            color: #f9fafb;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+        
+        .log-timestamp {
+            color: #9ca3af;
+        }
+        
+        .log-level-info {
+            color: #60a5fa;
+        }
+        
+        .log-level-success {
+            color: #34d399;
+        }
+        
+        .log-level-warning {
+            color: #fbbf24;
+        }
+        
+        .log-level-error {
+            color: #f87171;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .agents-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .agent-metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .agent-actions {
+                flex-direction: column;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">
+                    <div class="logo-icon">AI</div>
+                    <span>AIAIAI Consulting</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="agents.html" class="active">Agentes</a></li>
+                    <li><a href="clients.html">Clientes</a></li>
+                    <li><a href="projects.html">Proyectos</a></li>
+                    <li><a href="reports.html">Reportes</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header fade-in-up">
+                <h1>Agentes de IA</h1>
+                <p>Gestiona y monitorea tus agentes de inteligencia artificial especializados</p>
+            </div>
+
+            <!-- Agents Grid -->
+            <div class="agents-grid">
+                <!-- Lead Scorer Agent -->
+                <div class="agent-card fade-in-up">
+                    <div class="agent-header">
+                        <div class="agent-icon">📊</div>
+                        <div class="agent-info">
+                            <h3>Lead Scorer</h3>
+                            <span class="agent-status status-active">Activo</span>
+                        </div>
+                    </div>
+                    <div class="agent-description">
+                        Califica automáticamente tus leads y prioriza los más valiosos para tu equipo de ventas.
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">85%</div>
+                            <div class="metric-label">Precisión</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">1,247</div>
+                            <div class="metric-label">Leads Procesados</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">20h</div>
+                            <div class="metric-label">Tiempo Ahorrado</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$49</div>
+                            <div class="metric-label">Precio/mes</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="btn btn-primary" onclick="openAgentModal('lead-scorer')">Configurar</button>
+                        <button class="btn btn-secondary" onclick="viewAgentLogs('lead-scorer')">Ver Logs</button>
+                    </div>
+                </div>
+
+                <!-- Proposal Builder Agent -->
+                <div class="agent-card fade-in-up">
+                    <div class="agent-header">
+                        <div class="agent-icon">📝</div>
+                        <div class="agent-info">
+                            <h3>Proposal Builder</h3>
+                            <span class="agent-status status-active">Activo</span>
+                        </div>
+                    </div>
+                    <div class="agent-description">
+                        Genera propuestas profesionales en 5 minutos en lugar de 2 horas de trabajo manual.
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">95%</div>
+                            <div class="metric-label">Precisión</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">89</div>
+                            <div class="metric-label">Propuestas Creadas</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">40h</div>
+                            <div class="metric-label">Tiempo Ahorrado</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$79</div>
+                            <div class="metric-label">Precio/mes</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="btn btn-primary" onclick="openAgentModal('proposal-builder')">Configurar</button>
+                        <button class="btn btn-secondary" onclick="viewAgentLogs('proposal-builder')">Ver Logs</button>
+                    </div>
+                </div>
+
+                <!-- Meeting Summarizer Agent -->
+                <div class="agent-card fade-in-up">
+                    <div class="agent-header">
+                        <div class="agent-icon">🎯</div>
+                        <div class="agent-info">
+                            <h3>Meeting Summarizer</h3>
+                            <span class="agent-status status-active">Activo</span>
+                        </div>
+                    </div>
+                    <div class="agent-description">
+                        Convierte reuniones en acciones concretas con resúmenes y tareas automáticas.
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">88%</div>
+                            <div class="metric-label">Precisión</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">156</div>
+                            <div class="metric-label">Reuniones Procesadas</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">15h</div>
+                            <div class="metric-label">Tiempo Ahorrado</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$39</div>
+                            <div class="metric-label">Precio/mes</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="btn btn-primary" onclick="openAgentModal('meeting-summarizer')">Configurar</button>
+                        <button class="btn btn-secondary" onclick="viewAgentLogs('meeting-summarizer')">Ver Logs</button>
+                    </div>
+                </div>
+
+                <!-- CRM Updater Agent -->
+                <div class="agent-card fade-in-up">
+                    <div class="agent-header">
+                        <div class="agent-icon">🔄</div>
+                        <div class="agent-info">
+                            <h3>CRM Updater</h3>
+                            <span class="agent-status status-beta">Beta</span>
+                        </div>
+                    </div>
+                    <div class="agent-description">
+                        Mantén tu base de datos siempre actualizada con sincronización automática.
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">92%</div>
+                            <div class="metric-label">Precisión</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">2,341</div>
+                            <div class="metric-label">Registros Actualizados</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">25h</div>
+                            <div class="metric-label">Tiempo Ahorrado</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$59</div>
+                            <div class="metric-label">Precio/mes</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="btn btn-primary" onclick="openAgentModal('crm-updater')">Configurar</button>
+                        <button class="btn btn-secondary" onclick="viewAgentLogs('crm-updater')">Ver Logs</button>
+                    </div>
+                </div>
+
+                <!-- Follow-up Scheduler Agent -->
+                <div class="agent-card fade-in-up">
+                    <div class="agent-header">
+                        <div class="agent-icon">📅</div>
+                        <div class="agent-info">
+                            <h3>Follow-up Scheduler</h3>
+                            <span class="agent-status status-development">En Desarrollo</span>
+                        </div>
+                    </div>
+                    <div class="agent-description">
+                        Automatiza seguimientos y agendamiento para nunca perder una oportunidad.
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">90%</div>
+                            <div class="metric-label">Precisión</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">0</div>
+                            <div class="metric-label">Seguimientos Programados</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">0h</div>
+                            <div class="metric-label">Tiempo Ahorrado</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$49</div>
+                            <div class="metric-label">Precio/mes</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="btn btn-primary" onclick="openAgentModal('followup-scheduler')">Configurar</button>
+                        <button class="btn btn-secondary" onclick="viewAgentLogs('followup-scheduler')">Ver Logs</button>
+                    </div>
+                </div>
+
+                <!-- Invoice Generator Agent -->
+                <div class="agent-card fade-in-up">
+                    <div class="agent-header">
+                        <div class="agent-icon">💰</div>
+                        <div class="agent-info">
+                            <h3>Invoice Generator</h3>
+                            <span class="agent-status status-development">En Desarrollo</span>
+                        </div>
+                    </div>
+                    <div class="agent-description">
+                        Genera facturas y boletas automáticamente con la información de tus proyectos.
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">0%</div>
+                            <div class="metric-label">Precisión</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">0</div>
+                            <div class="metric-label">Facturas Generadas</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">0h</div>
+                            <div class="metric-label">Tiempo Ahorrado</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$39</div>
+                            <div class="metric-label">Precio/mes</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="btn btn-primary" onclick="openAgentModal('invoice-generator')">Configurar</button>
+                        <button class="btn btn-secondary" onclick="viewAgentLogs('invoice-generator')">Ver Logs</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Agent Configuration Modal -->
+    <div id="agentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Configurar Agente</h2>
+                <button class="close" onclick="closeAgentModal()">&times;</button>
+            </div>
+            <div id="modalContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Agent data
+        const agents = {
+            'lead-scorer': {
+                name: 'Lead Scorer',
+                description: 'Califica automáticamente tus leads y prioriza los más valiosos',
+                config: {
+                    threshold_hot: 80,
+                    threshold_warm: 60,
+                    threshold_cold: 40,
+                    industry_multipliers: {
+                        technology: 1.2,
+                        finance: 1.1,
+                        healthcare: 1.0,
+                        retail: 0.9,
+                        manufacturing: 0.8
+                    }
+                }
+            },
+            'proposal-builder': {
+                name: 'Proposal Builder',
+                description: 'Genera propuestas profesionales en minutos',
+                config: {
+                    max_sections: 10,
+                    min_sections: 5,
+                    markup_percentage: 0.3,
+                    minimum_project_value: 5000,
+                    maximum_project_value: 500000
+                }
+            },
+            'meeting-summarizer': {
+                name: 'Meeting Summarizer',
+                description: 'Convierte reuniones en acciones concretas',
+                config: {
+                    max_summary_length: 500,
+                    min_action_items: 1,
+                    max_action_items: 20,
+                    confidence_threshold: 0.7
+                }
+            },
+            'crm-updater': {
+                name: 'CRM Updater',
+                description: 'Mantén tu base de datos siempre actualizada',
+                config: {
+                    sync_interval: 300,
+                    max_retries: 3,
+                    batch_size: 100,
+                    duplicate_detection: true
+                }
+            },
+            'followup-scheduler': {
+                name: 'Follow-up Scheduler',
+                description: 'Automatiza seguimientos y agendamiento',
+                config: {
+                    default_delay_hours: 24,
+                    max_followups: 5,
+                    business_hours_only: true,
+                    timezone: 'America/Santiago'
+                }
+            },
+            'invoice-generator': {
+                name: 'Invoice Generator',
+                description: 'Genera facturas y boletas automáticamente',
+                config: {
+                    default_currency: 'USD',
+                    tax_rate: 0.19,
+                    payment_terms: '30 days',
+                    auto_send: false
+                }
+            }
+        };
+
+        function openAgentModal(agentId) {
+            const agent = agents[agentId];
+            if (!agent) return;
+
+            document.getElementById('modalTitle').textContent = `Configurar ${agent.name}`;
+            
+            const configHtml = `
+                <div class="config-section">
+                    <h3>Configuración General</h3>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <textarea readonly>${agent.description}</textarea>
+                    </div>
+                </div>
+                
+                <div class="config-section">
+                    <h3>Parámetros</h3>
+                    ${Object.entries(agent.config).map(([key, value]) => `
+                        <div class="form-group">
+                            <label>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</label>
+                            <input type="${typeof value === 'number' ? 'number' : 'text'}" 
+                                   value="${value}" 
+                                   id="config_${key}">
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="config-section">
+                    <h3>Logs Recientes</h3>
+                    <div class="logs-container" id="agentLogs">
+                        <div class="log-entry">
+                            <span class="log-timestamp">[2025-01-06 17:45:23]</span>
+                            <span class="log-level-info">[INFO]</span> Agente iniciado correctamente
+                        </div>
+                        <div class="log-entry">
+                            <span class="log-timestamp">[2025-01-06 17:45:24]</span>
+                            <span class="log-level-success">[SUCCESS]</span> Configuración cargada
+                        </div>
+                        <div class="log-entry">
+                            <span class="log-timestamp">[2025-01-06 17:45:25]</span>
+                            <span class="log-level-info">[INFO]</span> Esperando tareas...
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button class="btn btn-primary" onclick="saveAgentConfig('${agentId}')">Guardar Configuración</button>
+                    <button class="btn btn-secondary" onclick="testAgent('${agentId}')">Probar Agente</button>
+                </div>
+            `;
+            
+            document.getElementById('modalContent').innerHTML = configHtml;
+            document.getElementById('agentModal').style.display = 'block';
+        }
+
+        function closeAgentModal() {
+            document.getElementById('agentModal').style.display = 'none';
+        }
+
+        function saveAgentConfig(agentId) {
+            const agent = agents[agentId];
+            const config = {};
+            
+            Object.keys(agent.config).forEach(key => {
+                const input = document.getElementById(`config_${key}`);
+                if (input) {
+                    config[key] = input.type === 'number' ? parseFloat(input.value) : input.value;
+                }
+            });
+            
+            // Simulate saving
+            notificationManager.success('Configuración Guardada', 
+                `La configuración del agente ${agent.name} ha sido guardada exitosamente.`);
+            
+            // Dispatch custom event
+            document.dispatchEvent(new CustomEvent('agent-updated', {
+                detail: { agentName: agent.name, agentId: agentId }
+            }));
+            
+            closeAgentModal();
+        }
+
+        function testAgent(agentId) {
+            const agent = agents[agentId];
+            alert(`Probando agente ${agent.name}...`);
+        }
+
+        function viewAgentLogs(agentId) {
+            const agent = agents[agentId];
+            alert(`Mostrando logs de ${agent.name}`);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('agentModal');
+            if (event.target === modal) {
+                closeAgentModal();
+            }
+        }
+
+        // Add some sample log entries
+        function addLogEntry(agentId, level, message) {
+            const logsContainer = document.getElementById('agentLogs');
+            if (!logsContainer) return;
+            
+            const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="log-level-${level}">[${level.toUpperCase()}]</span> ${message}
+            `;
+            
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        // Simulate real-time updates
+        setInterval(() => {
+            const activeAgents = ['lead-scorer', 'proposal-builder', 'meeting-summarizer'];
+            const randomAgent = activeAgents[Math.floor(Math.random() * activeAgents.length)];
+            const levels = ['info', 'success', 'warning'];
+            const messages = [
+                'Procesando nueva tarea...',
+                'Tarea completada exitosamente',
+                'Advertencia: Tiempo de respuesta elevado',
+                'Actualizando métricas...',
+                'Sincronizando con CRM...'
+            ];
+            
+            const randomLevel = levels[Math.floor(Math.random() * levels.length)];
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            
+            // Only add log if modal is open
+            if (document.getElementById('agentModal').style.display === 'block') {
+                addLogEntry(randomAgent, randomLevel, randomMessage);
+            }
+        }, 5000);
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('AIAIAI Consulting - Agents Dashboard loaded');
+        });
+    </script>
+</body>
+</html>

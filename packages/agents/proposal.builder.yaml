@@ -1,0 +1,404 @@
+apiVersion: v1
+kind: AgentSpec
+name: proposal.builder
+version: 1.0.0
+owner: AIAIAI Consulting
+description: "Generación automática de propuestas comerciales profesionales basadas en perfil del cliente y necesidades identificadas"
+responsibility: "Crear propuestas comerciales personalizadas que maximicen la probabilidad de cierre"
+
+# Input Schema
+inputs:
+  client_profile:
+    type: object
+    required: true
+    properties:
+      name:
+        type: string
+        description: "Nombre del cliente"
+      company:
+        type: string
+        description: "Empresa del cliente"
+      industry:
+        type: string
+        description: "Industria de la empresa"
+      company_size:
+        type: string
+        enum: ["startup", "small", "medium", "enterprise"]
+        description: "Tamaño de la empresa"
+      role:
+        type: string
+        description: "Cargo del contacto"
+      pain_points:
+        type: array
+        items:
+          type: string
+        description: "Puntos de dolor identificados"
+      goals:
+        type: array
+        items:
+          type: string
+        description: "Objetivos del cliente"
+      budget_range:
+        type: string
+        enum: ["<10k", "10k-50k", "50k-100k", "100k-500k", ">500k"]
+        description: "Rango de presupuesto"
+      timeline:
+        type: string
+        enum: ["immediate", "1-3months", "3-6months", "6-12months", ">12months"]
+        description: "Timeline de implementación"
+  
+  meeting_notes:
+    type: string
+    required: true
+    description: "Notas de la reunión de descubrimiento"
+  
+  project_scope:
+    type: object
+    required: true
+    properties:
+      objectives:
+        type: array
+        items:
+          type: string
+        description: "Objetivos del proyecto"
+      deliverables:
+        type: array
+        items:
+          type: string
+        description: "Entregables del proyecto"
+      timeline:
+        type: object
+        properties:
+          start_date:
+            type: string
+            format: date
+          end_date:
+            type: string
+            format: date
+          milestones:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                date:
+                  type: string
+                  format: date
+                deliverables:
+                  type: array
+                  items:
+                    type: string
+      team:
+        type: array
+        items:
+          type: object
+          properties:
+            role:
+              type: string
+            hours:
+              type: integer
+            rate:
+              type: number
+
+# Output Schema
+outputs:
+  proposal_document:
+    type: object
+    properties:
+      proposal_url:
+        type: string
+        format: uri
+        description: "URL del documento de propuesta generado"
+      proposal_id:
+        type: string
+        description: "ID único de la propuesta"
+      status:
+        type: string
+        enum: ["draft", "review", "approved", "sent"]
+        description: "Estado de la propuesta"
+      sections:
+        type: array
+        items:
+          type: object
+          properties:
+            title:
+              type: string
+            content:
+              type: string
+            order:
+              type: integer
+      pricing:
+        type: object
+        properties:
+          total_amount:
+            type: number
+            description: "Monto total de la propuesta"
+          currency:
+            type: string
+            default: "USD"
+          breakdown:
+            type: array
+            items:
+              type: object
+              properties:
+                item:
+                  type: string
+                quantity:
+                  type: integer
+                unit_price:
+                  type: number
+                total:
+                  type: number
+          payment_terms:
+            type: string
+            description: "Términos de pago"
+      timeline:
+        type: object
+        properties:
+          duration_weeks:
+            type: integer
+            description: "Duración en semanas"
+          start_date:
+            type: string
+            format: date
+          end_date:
+            type: string
+            format: date
+          milestones:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                date:
+                  type: string
+                  format: date
+                deliverables:
+                  type: array
+                  items:
+                    type: string
+      next_steps:
+        type: array
+        items:
+          type: string
+        description: "Próximos pasos recomendados"
+
+# Policies
+policies:
+  mode: ["auto", "review", "approve"]
+  sla_seconds: 300
+  retry_attempts: 2
+  timeout_seconds: 600
+  approval_required: true
+
+# Tools and Integrations
+tools:
+  - docs.create
+  - drive.upload
+  - gmail.draft
+  - crm.update
+  - calendar.schedule
+
+# Observability
+observability:
+  metrics:
+    - latency_ms
+    - tokens_used
+    - document_size_kb
+    - approval_time_hours
+  logs:
+    level: "info"
+    format: "structured"
+  alerts:
+    - high_latency
+    - document_generation_failure
+    - approval_delay
+
+# Business Rules
+business_rules:
+  pricing_rules:
+    markup_percentage: 0.3
+    minimum_project_value: 5000
+    maximum_project_value: 500000
+    currency: "USD"
+  
+  timeline_rules:
+    minimum_duration_weeks: 2
+    maximum_duration_weeks: 52
+    buffer_percentage: 0.2
+  
+  content_rules:
+    max_sections: 10
+    min_sections: 5
+    required_sections:
+      - "Executive Summary"
+      - "Project Scope"
+      - "Timeline"
+      - "Pricing"
+      - "Next Steps"
+  
+  approval_workflow:
+    auto_approve_threshold: 10000
+    manager_approval_threshold: 50000
+    director_approval_threshold: 100000
+
+# Templates
+templates:
+  executive_summary:
+    template: |
+      ## Resumen Ejecutivo
+      
+      Basado en nuestra reunión del {meeting_date}, hemos identificado que {company_name} enfrenta los siguientes desafíos:
+      
+      {pain_points_list}
+      
+      Nuestra propuesta aborda estos desafíos mediante {solution_summary}, entregando {key_benefits} en un plazo de {timeline}.
+  
+  project_scope:
+    template: |
+      ## Alcance del Proyecto
+      
+      ### Objetivos
+      {objectives_list}
+      
+      ### Entregables
+      {deliverables_list}
+      
+      ### Metodología
+      Utilizaremos nuestra metodología probada que incluye {methodology_steps}.
+  
+  pricing:
+    template: |
+      ## Inversión
+      
+      ### Resumen de Costos
+      {pricing_breakdown}
+      
+      ### Términos de Pago
+      {payment_terms}
+      
+      ### ROI Esperado
+      {roi_calculation}
+
+# Examples
+examples:
+  input_example:
+    client_profile:
+      name: "Carlos Rodríguez"
+      company: "Innovate Solutions"
+      industry: "technology"
+      company_size: "medium"
+      role: "CEO"
+      pain_points:
+        - "Procesos manuales que consumen tiempo"
+        - "Falta de visibilidad en el pipeline de ventas"
+        - "Errores en la gestión de clientes"
+      goals:
+        - "Automatizar procesos de ventas"
+        - "Mejorar la eficiencia del equipo"
+        - "Reducir errores operacionales"
+      budget_range: "50k-100k"
+      timeline: "3-6months"
+    
+    meeting_notes: |
+      Reunión con Carlos Rodríguez, CEO de Innovate Solutions. Empresa de tecnología con 50 empleados.
+      Necesidades principales: automatización de procesos de ventas, integración con CRM existente,
+      capacitación del equipo. Presupuesto flexible, timeline de 3-6 meses. Interés en ROI medible.
+    
+    project_scope:
+      objectives:
+        - "Implementar automatización de procesos de ventas"
+        - "Integrar sistema con CRM existente"
+        - "Capacitar al equipo en nuevas herramientas"
+      deliverables:
+        - "Sistema de automatización configurado"
+        - "Integración con CRM completada"
+        - "Documentación técnica"
+        - "Capacitación del equipo"
+      timeline:
+        start_date: "2025-03-01"
+        end_date: "2025-08-01"
+        milestones:
+          - name: "Análisis y Configuración"
+            date: "2025-04-01"
+            deliverables: ["Análisis de procesos", "Configuración inicial"]
+          - name: "Implementación"
+            date: "2025-06-01"
+            deliverables: ["Sistema implementado", "Integración completada"]
+          - name: "Capacitación y Entrega"
+            date: "2025-08-01"
+            deliverables: ["Capacitación completada", "Documentación final"]
+      team:
+        - role: "Project Manager"
+          hours: 40
+          rate: 150
+        - role: "Technical Lead"
+          hours: 80
+          rate: 120
+        - role: "Integration Specialist"
+          hours: 60
+          rate: 100
+  
+  output_example:
+    proposal_document:
+      proposal_url: "https://drive.google.com/file/d/abc123"
+      proposal_id: "PROP-2025-001"
+      status: "draft"
+      sections:
+        - title: "Executive Summary"
+          content: "Resumen ejecutivo personalizado..."
+          order: 1
+        - title: "Project Scope"
+          content: "Alcance detallado del proyecto..."
+          order: 2
+        - title: "Timeline"
+          content: "Cronograma detallado..."
+          order: 3
+        - title: "Pricing"
+          content: "Desglose de costos..."
+          order: 4
+        - title: "Next Steps"
+          content: "Próximos pasos..."
+          order: 5
+      pricing:
+        total_amount: 75000
+        currency: "USD"
+        breakdown:
+          - item: "Project Management"
+            quantity: 40
+            unit_price: 150
+            total: 6000
+          - item: "Technical Implementation"
+            quantity: 80
+            unit_price: 120
+            total: 9600
+          - item: "Integration Services"
+            quantity: 60
+            unit_price: 100
+            total: 6000
+          - item: "Training and Support"
+            quantity: 20
+            unit_price: 200
+            total: 4000
+        payment_terms: "50% al inicio, 50% al completar"
+      timeline:
+        duration_weeks: 20
+        start_date: "2025-03-01"
+        end_date: "2025-08-01"
+        milestones:
+          - name: "Análisis y Configuración"
+            date: "2025-04-01"
+            deliverables: ["Análisis de procesos", "Configuración inicial"]
+          - name: "Implementación"
+            date: "2025-06-01"
+            deliverables: ["Sistema implementado", "Integración completada"]
+          - name: "Capacitación y Entrega"
+            date: "2025-08-01"
+            deliverables: ["Capacitación completada", "Documentación final"]
+      next_steps:
+        - "Revisar propuesta y aprobar alcance"
+        - "Firmar contrato y realizar pago inicial"
+        - "Programar kickoff meeting"
+        - "Iniciar fase de análisis"

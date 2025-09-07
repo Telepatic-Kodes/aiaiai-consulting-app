@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Proyectos - AIAIAI Consulting</title>
+    <script src="auth.js"></script>
+    <script src="notifications.js"></script>
+    <script src="api.js"></script>
+    <script src="theme.js"></script>
+    <script src="search.js"></script>
+    <script src="shortcuts.js"></script>
+    <script src="animations.js"></script>
+    <script src="loading.js"></script>
+    <script src="accessibility.js"></script>
+    <script src="responsive.js"></script>
+    <script src="typography.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #3A86FF;
+            --accent: #FFD700;
+            --dark: #1f2937;
+            --light: #f8f9fa;
+            --gray: #6b7280;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--light);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .nav-links a.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main {
+            margin-top: 80px;
+            padding: 2rem 0;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .page-title p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            padding: 0.25rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: fit-content;
+        }
+        
+        .view-toggle button {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .view-toggle button.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+        
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .project-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-client {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+        
+        .project-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-planning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-completed {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        
+        .status-on-hold {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .project-description {
+            color: var(--gray);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .project-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+        
+        .project-timeline {
+            margin-bottom: 1rem;
+        }
+        
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .timeline-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+        
+        .timeline-dot.completed {
+            background: var(--success);
+        }
+        
+        .timeline-dot.current {
+            background: var(--warning);
+        }
+        
+        .project-progress {
+            margin-bottom: 1rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+        
+        .project-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+        
+        /* Timeline View */
+        .timeline-view {
+            display: none;
+        }
+        
+        .timeline-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-item-large {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .timeline-item-large:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 40px;
+            bottom: -2rem;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .timeline-content {
+            flex: 1;
+        }
+        
+        .timeline-title {
+            font-size: 1.125rem;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+        
+        .timeline-description {
+            color: var(--gray);
+            line-height: 1.5;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .close:hover {
+            color: var(--dark);
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">
+                    <div class="logo-icon">AI</div>
+                    <span>AIAIAI Consulting</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="agents.html">Agentes</a></li>
+                    <li><a href="clients.html">Clientes</a></li>
+                    <li><a href="projects.html" class="active">Proyectos</a></li>
+                    <li><a href="reports.html">Reportes</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header fade-in-up">
+                <div class="page-title">
+                    <h1>Gestión de Proyectos</h1>
+                    <p>Monitorea y gestiona todos tus proyectos de automatización</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn btn-secondary" onclick="exportProjects()">Exportar</button>
+                    <button class="btn btn-primary" onclick="openProjectModal()">Nuevo Proyecto</button>
+                </div>
+            </div>
+
+            <!-- View Toggle -->
+            <div class="view-toggle fade-in-up">
+                <button class="active" onclick="switchView('grid')">Vista de Tarjetas</button>
+                <button onclick="switchView('timeline')">Vista de Cronograma</button>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid fade-in-up">
+                <div class="stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Proyectos Activos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">Completados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">$450K</div>
+                    <div class="stat-label">Revenue Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">94%</div>
+                    <div class="stat-label">Tasa de Éxito</div>
+                </div>
+            </div>
+
+            <!-- Projects Grid View -->
+            <div id="gridView" class="projects-grid">
+                <!-- Project cards will be generated by JavaScript -->
+            </div>
+
+            <!-- Timeline View -->
+            <div id="timelineView" class="timeline-view">
+                <div class="timeline-container">
+                    <!-- Timeline items will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Project Modal -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nuevo Proyecto</h2>
+                <button class="close" onclick="closeProjectModal()">&times;</button>
+            </div>
+            <form id="projectForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre del Proyecto *</label>
+                        <input type="text" id="projectName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Cliente *</label>
+                        <select id="projectClient" required>
+                            <option value="">Seleccionar cliente...</option>
+                            <option value="1">TechCorp Chile</option>
+                            <option value="2">Innovate Solutions</option>
+                            <option value="3">RetailMax</option>
+                            <option value="4">StartupLatam</option>
+                            <option value="5">FinancePro</option>
+                            <option value="6">HealthTech</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="projectStatus">
+                            <option value="planning">Planificación</option>
+                            <option value="active">Activo</option>
+                            <option value="completed">Completado</option>
+                            <option value="on-hold">En Pausa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Prioridad</label>
+                        <select id="projectPriority">
+                            <option value="low">Baja</option>
+                            <option value="medium">Media</option>
+                            <option value="high">Alta</option>
+                            <option value="critical">Crítica</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Fecha de Inicio</label>
+                        <input type="date" id="projectStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de Fin</label>
+                        <input type="date" id="projectEndDate">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Presupuesto</label>
+                        <input type="number" id="projectBudget" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Progreso (%)</label>
+                        <input type="number" id="projectProgress" min="0" max="100" value="0">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="projectDescription" rows="3" placeholder="Describe el proyecto..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Agentes a Implementar</label>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                            <input type="checkbox" value="lead-scorer"> Lead Scorer
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                            <input type="checkbox" value="proposal-builder"> Proposal Builder
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                            <input type="checkbox" value="meeting-summarizer"> Meeting Summarizer
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                            <input type="checkbox" value="crm-updater"> CRM Updater
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                            <input type="checkbox" value="followup-scheduler"> Follow-up Scheduler
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                            <input type="checkbox" value="invoice-generator"> Invoice Generator
+                        </label>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Guardar Proyecto</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeProjectModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample project data
+        const projects = [
+            {
+                id: 1,
+                name: "Implementación Lead Scorer",
+                client: "TechCorp Chile",
+                clientId: 1,
+                status: "active",
+                priority: "high",
+                startDate: "2025-01-01",
+                endDate: "2025-02-15",
+                budget: 25000,
+                progress: 75,
+                description: "Implementación completa del agente Lead Scorer para automatizar la calificación de leads",
+                agents: ["lead-scorer"],
+                milestones: [
+                    { name: "Análisis de procesos", date: "2025-01-05", completed: true },
+                    { name: "Configuración inicial", date: "2025-01-15", completed: true },
+                    { name: "Pruebas beta", date: "2025-01-25", completed: true },
+                    { name: "Implementación final", date: "2025-02-10", completed: false },
+                    { name: "Capacitación", date: "2025-02-15", completed: false }
+                ]
+            },
+            {
+                id: 2,
+                name: "Automatización de Propuestas",
+                client: "Innovate Solutions",
+                clientId: 2,
+                status: "active",
+                priority: "medium",
+                startDate: "2025-01-10",
+                endDate: "2025-03-01",
+                budget: 15000,
+                progress: 45,
+                description: "Implementación del Proposal Builder para automatizar la generación de propuestas comerciales",
+                agents: ["proposal-builder", "meeting-summarizer"],
+                milestones: [
+                    { name: "Reunión de descubrimiento", date: "2025-01-12", completed: true },
+                    { name: "Configuración de templates", date: "2025-01-20", completed: true },
+                    { name: "Integración con CRM", date: "2025-02-05", completed: false },
+                    { name: "Pruebas de usuario", date: "2025-02-20", completed: false },
+                    { name: "Go-live", date: "2025-03-01", completed: false }
+                ]
+            },
+            {
+                id: 3,
+                name: "Optimización de Reuniones",
+                client: "RetailMax",
+                clientId: 3,
+                status: "completed",
+                priority: "high",
+                startDate: "2024-12-01",
+                endDate: "2024-12-31",
+                budget: 45000,
+                progress: 100,
+                description: "Implementación completa del Meeting Summarizer para optimizar el seguimiento de reuniones",
+                agents: ["meeting-summarizer", "crm-updater"],
+                milestones: [
+                    { name: "Análisis de necesidades", date: "2024-12-05", completed: true },
+                    { name: "Configuración del agente", date: "2024-12-10", completed: true },
+                    { name: "Integración con calendario", date: "2024-12-15", completed: true },
+                    { name: "Capacitación del equipo", date: "2024-12-20", completed: true },
+                    { name: "Implementación final", date: "2024-12-31", completed: true }
+                ]
+            },
+            {
+                id: 4,
+                name: "Automatización de CRM",
+                client: "FinancePro",
+                clientId: 5,
+                status: "planning",
+                priority: "medium",
+                startDate: "2025-02-01",
+                endDate: "2025-03-15",
+                budget: 32000,
+                progress: 10,
+                description: "Implementación del CRM Updater para mantener la base de datos siempre actualizada",
+                agents: ["crm-updater", "followup-scheduler"],
+                milestones: [
+                    { name: "Análisis de datos actuales", date: "2025-02-05", completed: false },
+                    { name: "Configuración de sincronización", date: "2025-02-15", completed: false },
+                    { name: "Pruebas de integración", date: "2025-02-25", completed: false },
+                    { name: "Migración de datos", date: "2025-03-05", completed: false },
+                    { name: "Capacitación y go-live", date: "2025-03-15", completed: false }
+                ]
+            },
+            {
+                id: 5,
+                name: "Sistema de Facturación",
+                client: "HealthTech",
+                clientId: 6,
+                status: "on-hold",
+                priority: "low",
+                startDate: "2025-01-15",
+                endDate: "2025-04-01",
+                budget: 18000,
+                progress: 25,
+                description: "Implementación del Invoice Generator para automatizar la generación de facturas",
+                agents: ["invoice-generator"],
+                milestones: [
+                    { name: "Análisis de procesos actuales", date: "2025-01-20", completed: true },
+                    { name: "Configuración de templates", date: "2025-02-01", completed: false },
+                    { name: "Integración con contabilidad", date: "2025-02-15", completed: false },
+                    { name: "Pruebas de facturación", date: "2025-03-01", completed: false },
+                    { name: "Implementación final", date: "2025-04-01", completed: false }
+                ]
+            }
+        ];
+
+        let currentView = 'grid';
+
+        function renderProjects() {
+            if (currentView === 'grid') {
+                renderGridView();
+            } else {
+                renderTimelineView();
+            }
+        }
+
+        function renderGridView() {
+            const grid = document.getElementById('gridView');
+            grid.innerHTML = '';
+
+            projects.forEach(project => {
+                const card = createProjectCard(project);
+                grid.appendChild(card);
+            });
+        }
+
+        function createProjectCard(project) {
+            const card = document.createElement('div');
+            card.className = 'project-card fade-in-up';
+            
+            const statusClass = `status-${project.status}`;
+            const statusText = {
+                'planning': 'Planificación',
+                'active': 'Activo',
+                'completed': 'Completado',
+                'on-hold': 'En Pausa'
+            }[project.status];
+
+            const priorityText = {
+                'low': 'Baja',
+                'medium': 'Media',
+                'high': 'Alta',
+                'critical': 'Crítica'
+            }[project.priority];
+
+            const completedMilestones = project.milestones.filter(m => m.completed).length;
+            const totalMilestones = project.milestones.length;
+
+            card.innerHTML = `
+                <div class="project-header">
+                    <div>
+                        <div class="project-title">${project.name}</div>
+                        <div class="project-client">${project.client}</div>
+                    </div>
+                    <span class="project-status ${statusClass}">${statusText}</span>
+                </div>
+                
+                <div class="project-description">
+                    ${project.description}
+                </div>
+                
+                <div class="project-metrics">
+                    <div class="metric">
+                        <div class="metric-value">$${project.budget.toLocaleString()}</div>
+                        <div class="metric-label">Presupuesto</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${completedMilestones}/${totalMilestones}</div>
+                        <div class="metric-label">Hitos</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${priorityText}</div>
+                        <div class="metric-label">Prioridad</div>
+                    </div>
+                </div>
+                
+                <div class="project-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${project.progress}%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span>Progreso</span>
+                        <span>${project.progress}%</span>
+                    </div>
+                </div>
+                
+                <div class="project-timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot ${project.milestones[0]?.completed ? 'completed' : ''}"></div>
+                        <span>${project.milestones[0]?.name || 'Sin hitos'}</span>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot ${project.milestones[1]?.completed ? 'completed' : ''}"></div>
+                        <span>${project.milestones[1]?.name || ''}</span>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot ${project.milestones[2]?.completed ? 'completed' : ''}"></div>
+                        <span>${project.milestones[2]?.name || ''}</span>
+                    </div>
+                </div>
+                
+                <div class="project-actions">
+                    <button class="btn btn-primary btn-sm" onclick="editProject(${project.id})">Editar</button>
+                    <button class="btn btn-secondary btn-sm" onclick="viewProjectDetails(${project.id})">Ver Detalles</button>
+                    <button class="btn btn-secondary btn-sm" onclick="updateProgress(${project.id})">Actualizar</button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function renderTimelineView() {
+            const container = document.getElementById('timelineView');
+            container.innerHTML = '<div class="timeline-container"></div>';
+            
+            const timelineContainer = container.querySelector('.timeline-container');
+            
+            projects.forEach(project => {
+                const timelineItem = createTimelineItem(project);
+                timelineContainer.appendChild(timelineItem);
+            });
+        }
+
+        function createTimelineItem(project) {
+            const item = document.createElement('div');
+            item.className = 'timeline-item-large';
+            
+            const statusIcon = {
+                'planning': '📋',
+                'active': '🚀',
+                'completed': '✅',
+                'on-hold': '⏸️'
+            }[project.status];
+
+            const completedMilestones = project.milestones.filter(m => m.completed).length;
+            const totalMilestones = project.milestones.length;
+
+            item.innerHTML = `
+                <div class="timeline-icon">${statusIcon}</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">${project.name}</div>
+                    <div class="timeline-meta">
+                        <span>Cliente: ${project.client}</span>
+                        <span>Presupuesto: $${project.budget.toLocaleString()}</span>
+                        <span>Progreso: ${project.progress}%</span>
+                    </div>
+                    <div class="timeline-description">
+                        ${project.description}
+                    </div>
+                </div>
+            `;
+
+            return item;
+        }
+
+        function switchView(view) {
+            currentView = view;
+            
+            // Update toggle buttons
+            document.querySelectorAll('.view-toggle button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide views
+            document.getElementById('gridView').style.display = view === 'grid' ? 'grid' : 'none';
+            document.getElementById('timelineView').style.display = view === 'timeline' ? 'block' : 'none';
+            
+            renderProjects();
+        }
+
+        function openProjectModal(projectId = null) {
+            const modal = document.getElementById('projectModal');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('projectForm');
+
+            if (projectId) {
+                const project = projects.find(p => p.id === projectId);
+                if (project) {
+                    title.textContent = 'Editar Proyecto';
+                    populateProjectForm(project);
+                }
+            } else {
+                title.textContent = 'Nuevo Proyecto';
+                form.reset();
+            }
+
+            modal.style.display = 'block';
+        }
+
+        function closeProjectModal() {
+            document.getElementById('projectModal').style.display = 'none';
+        }
+
+        function populateProjectForm(project) {
+            document.getElementById('projectName').value = project.name;
+            document.getElementById('projectClient').value = project.clientId;
+            document.getElementById('projectStatus').value = project.status;
+            document.getElementById('projectPriority').value = project.priority;
+            document.getElementById('projectStartDate').value = project.startDate;
+            document.getElementById('projectEndDate').value = project.endDate;
+            document.getElementById('projectBudget').value = project.budget;
+            document.getElementById('projectProgress').value = project.progress;
+            document.getElementById('projectDescription').value = project.description;
+            
+            // Check agent checkboxes
+            project.agents.forEach(agent => {
+                const checkbox = document.querySelector(`input[value="${agent}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+
+        function editProject(projectId) {
+            openProjectModal(projectId);
+        }
+
+        function viewProjectDetails(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (project) {
+                const milestonesList = project.milestones.map(m => 
+                    `${m.completed ? '✅' : '⏳'} ${m.name} (${m.date})`
+                ).join('\n');
+                
+                alert(`Detalles del Proyecto: ${project.name}\n\nCliente: ${project.client}\nEstado: ${project.status}\nPrioridad: ${project.priority}\nPresupuesto: $${project.budget.toLocaleString()}\nProgreso: ${project.progress}%\nAgentes: ${project.agents.join(', ')}\n\nHitos:\n${milestonesList}`);
+            }
+        }
+
+        function updateProgress(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (project) {
+                const newProgress = prompt(`Actualizar progreso para ${project.name} (actual: ${project.progress}%):`, project.progress);
+                if (newProgress !== null && !isNaN(newProgress) && newProgress >= 0 && newProgress <= 100) {
+                    project.progress = parseInt(newProgress);
+                    renderProjects();
+                    alert('Progreso actualizado exitosamente');
+                }
+            }
+        }
+
+        function exportProjects() {
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "Nombre,Cliente,Estado,Prioridad,Presupuesto,Progreso,Fecha Inicio,Fecha Fin,Descripción\n" +
+                projects.map(project => 
+                    `"${project.name}","${project.client}","${project.status}","${project.priority}",${project.budget},${project.progress},"${project.startDate}","${project.endDate}","${project.description}"`
+                ).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "proyectos_aiaiai.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Form submission
+        document.getElementById('projectForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('projectName').value,
+                clientId: document.getElementById('projectClient').value,
+                status: document.getElementById('projectStatus').value,
+                priority: document.getElementById('projectPriority').value,
+                startDate: document.getElementById('projectStartDate').value,
+                endDate: document.getElementById('projectEndDate').value,
+                budget: document.getElementById('projectBudget').value,
+                progress: document.getElementById('projectProgress').value,
+                description: document.getElementById('projectDescription').value,
+                agents: Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value)
+            };
+
+            // Simulate saving
+            alert('Proyecto guardado exitosamente');
+            closeProjectModal();
+            
+            // In a real app, you would send this data to your API
+            console.log('Project data:', formData);
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('projectModal');
+            if (event.target === modal) {
+                closeProjectModal();
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderProjects();
+            console.log('AIAIAI Consulting - Projects Management loaded');
+        });
+    </script>
+</body>
+</html>

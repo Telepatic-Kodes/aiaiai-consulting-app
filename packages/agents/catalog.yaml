@@ -1,0 +1,366 @@
+apiVersion: v1
+kind: AgentCatalog
+name: aiaiai-agents
+version: 1.0.0
+owner: AIAIAI Consulting
+description: "Catálogo completo de agentes de IA especializados para emprendedores LATAM"
+
+# Catalog Metadata
+metadata:
+  created_date: "2025-01-01"
+  last_updated: "2025-01-01"
+  total_agents: 5
+  categories: 4
+  languages: ["es", "en"]
+  regions: ["LATAM", "US", "EU"]
+
+# Agent Categories
+categories:
+  commercial_marketing:
+    name: "Comercial & Marketing"
+    description: "Agentes especializados en ventas, marketing y generación de leads"
+    agents:
+      - lead.scorer
+      - proposal.builder
+      - followup.scheduler
+      - content.generator
+      - social.manager
+  
+  operations_client:
+    name: "Operaciones & Cliente"
+    description: "Agentes para gestión de operaciones y atención al cliente"
+    agents:
+      - meeting.summarizer
+      - crm.updater
+      - invoice.generator
+      - nps.collector
+      - support.triage
+  
+  finance_admin:
+    name: "Finanzas & Administración"
+    description: "Agentes para gestión financiera y administrativa"
+    agents:
+      - quote.calculator
+      - contract.drafter
+      - expense.tracker
+      - budget.analyzer
+      - compliance.checker
+  
+  knowledge_context:
+    name: "Conocimiento & Contexto"
+    description: "Agentes para gestión de conocimiento y contexto empresarial"
+    agents:
+      - knowledge.ingester
+      - rag.query
+      - training.material.generator
+      - best.practices.extractor
+
+# Agent Specifications
+agents:
+  lead.scorer:
+    spec_file: "lead.scorer.yaml"
+    status: "production"
+    version: "1.0.0"
+    pricing:
+      monthly: 49
+      currency: "USD"
+      usage_based: false
+    capabilities:
+      - "lead_qualification"
+      - "behavior_analysis"
+      - "scoring_algorithm"
+      - "crm_integration"
+    integrations:
+      - "salesforce"
+      - "hubspot"
+      - "pipedrive"
+      - "gmail"
+    sla:
+      response_time_ms: 30000
+      uptime_percentage: 99.9
+      accuracy_threshold: 0.85
+  
+  proposal.builder:
+    spec_file: "proposal.builder.yaml"
+    status: "production"
+    version: "1.0.0"
+    pricing:
+      monthly: 79
+      currency: "USD"
+      usage_based: false
+    capabilities:
+      - "proposal_generation"
+      - "pricing_calculation"
+      - "document_creation"
+      - "template_management"
+    integrations:
+      - "google_docs"
+      - "microsoft_word"
+      - "pdf_generator"
+      - "gmail"
+    sla:
+      response_time_ms: 300000
+      uptime_percentage: 99.9
+      accuracy_threshold: 0.9
+  
+  meeting.summarizer:
+    spec_file: "meeting.summarizer.yaml"
+    status: "production"
+    version: "1.0.0"
+    pricing:
+      monthly: 39
+      currency: "USD"
+      usage_based: false
+    capabilities:
+      - "transcript_analysis"
+      - "action_extraction"
+      - "sentiment_analysis"
+      - "summary_generation"
+    integrations:
+      - "zoom"
+      - "teams"
+      - "google_meet"
+      - "calendar"
+    sla:
+      response_time_ms: 120000
+      uptime_percentage: 99.9
+      accuracy_threshold: 0.88
+  
+  crm.updater:
+    spec_file: "crm.updater.yaml"
+    status: "development"
+    version: "0.9.0"
+    pricing:
+      monthly: 59
+      currency: "USD"
+      usage_based: false
+    capabilities:
+      - "data_synchronization"
+      - "field_mapping"
+      - "duplicate_detection"
+      - "data_validation"
+    integrations:
+      - "salesforce"
+      - "hubspot"
+      - "pipedrive"
+      - "zoho"
+    sla:
+      response_time_ms: 60000
+      uptime_percentage: 99.9
+      accuracy_threshold: 0.95
+  
+  followup.scheduler:
+    spec_file: "followup.scheduler.yaml"
+    status: "development"
+    version: "0.8.0"
+    pricing:
+      monthly: 49
+      currency: "USD"
+      usage_based: false
+    capabilities:
+      - "followup_automation"
+      - "calendar_integration"
+      - "email_scheduling"
+      - "reminder_management"
+    integrations:
+      - "gmail"
+      - "outlook"
+      - "calendar"
+      - "whatsapp"
+    sla:
+      response_time_ms: 15000
+      uptime_percentage: 99.9
+      accuracy_threshold: 0.92
+
+# Pricing Tiers
+pricing_tiers:
+  starter:
+    name: "Starter"
+    monthly_price: 99
+    currency: "USD"
+    included_agents: 2
+    max_leads_per_month: 100
+    max_meetings_per_month: 50
+    support_level: "email"
+    features:
+      - "2 agentes básicos"
+      - "Hasta 100 leads/mes"
+      - "Hasta 50 reuniones/mes"
+      - "Soporte por email"
+      - "Integración Gmail"
+      - "Dashboard básico"
+  
+  pro:
+    name: "Pro"
+    monthly_price: 299
+    currency: "USD"
+    included_agents: 5
+    max_leads_per_month: 500
+    max_meetings_per_month: 200
+    support_level: "priority"
+    features:
+      - "5 agentes especializados"
+      - "Hasta 500 leads/mes"
+      - "Hasta 200 reuniones/mes"
+      - "Soporte prioritario"
+      - "Integración WhatsApp"
+      - "Analytics avanzados"
+      - "Consultoría incluida"
+  
+  enterprise:
+    name: "Enterprise"
+    monthly_price: 999
+    currency: "USD"
+    included_agents: -1  # unlimited
+    max_leads_per_month: -1  # unlimited
+    max_meetings_per_month: -1  # unlimited
+    support_level: "dedicated"
+    features:
+      - "Agentes ilimitados"
+      - "Leads ilimitados"
+      - "Reuniones ilimitadas"
+      - "Soporte dedicado"
+      - "Integraciones personalizadas"
+      - "API completa"
+      - "Consultoría premium"
+
+# Integration Matrix
+integrations:
+  crm:
+    salesforce:
+      status: "available"
+      setup_time_hours: 2
+      features: ["sync", "update", "create"]
+    hubspot:
+      status: "available"
+      setup_time_hours: 1
+      features: ["sync", "update", "create"]
+    pipedrive:
+      status: "available"
+      setup_time_hours: 1
+      features: ["sync", "update"]
+    zoho:
+      status: "beta"
+      setup_time_hours: 3
+      features: ["sync"]
+  
+  communication:
+    gmail:
+      status: "available"
+      setup_time_hours: 0.5
+      features: ["send", "read", "schedule"]
+    outlook:
+      status: "available"
+      setup_time_hours: 0.5
+      features: ["send", "read", "schedule"]
+    whatsapp:
+      status: "beta"
+      setup_time_hours: 1
+      features: ["send", "receive"]
+    slack:
+      status: "development"
+      setup_time_hours: 1
+      features: ["send", "notify"]
+  
+  productivity:
+    google_docs:
+      status: "available"
+      setup_time_hours: 0.5
+      features: ["create", "edit", "share"]
+    microsoft_word:
+      status: "available"
+      setup_time_hours: 0.5
+      features: ["create", "edit"]
+    notion:
+      status: "beta"
+      setup_time_hours: 1
+      features: ["create", "update"]
+    asana:
+      status: "development"
+      setup_time_hours: 1
+      features: ["create", "update"]
+
+# Success Metrics
+success_metrics:
+  lead.scorer:
+    accuracy: 0.85
+    time_saved_hours_per_month: 20
+    conversion_improvement_percentage: 25
+    user_satisfaction: 4.5
+  
+  proposal.builder:
+    accuracy: 0.9
+    time_saved_hours_per_month: 40
+    proposal_acceptance_rate: 0.35
+    user_satisfaction: 4.7
+  
+  meeting.summarizer:
+    accuracy: 0.88
+    time_saved_hours_per_month: 15
+    action_completion_rate: 0.8
+    user_satisfaction: 4.6
+  
+  crm.updater:
+    accuracy: 0.95
+    time_saved_hours_per_month: 25
+    data_quality_improvement: 0.4
+    user_satisfaction: 4.4
+  
+  followup.scheduler:
+    accuracy: 0.92
+    time_saved_hours_per_month: 30
+    followup_completion_rate: 0.9
+    user_satisfaction: 4.5
+
+# Roadmap
+roadmap:
+  q1_2025:
+    - "Lanzamiento de lead.scorer v1.0"
+    - "Lanzamiento de proposal.builder v1.0"
+    - "Lanzamiento de meeting.summarizer v1.0"
+    - "Integración con WhatsApp"
+    - "Dashboard de analytics"
+  
+  q2_2025:
+    - "Lanzamiento de crm.updater v1.0"
+    - "Lanzamiento de followup.scheduler v1.0"
+    - "Integración con Notion"
+    - "API pública"
+    - "Mobile app"
+  
+  q3_2025:
+    - "Lanzamiento de invoice.generator"
+    - "Lanzamiento de content.generator"
+    - "Integración con Slack"
+    - "Advanced analytics"
+    - "White-label solution"
+  
+  q4_2025:
+    - "Lanzamiento de nps.collector"
+    - "Lanzamiento de contract.drafter"
+    - "AI-powered insights"
+    - "Enterprise features"
+    - "International expansion"
+
+# Support and Documentation
+support:
+  documentation:
+    url: "https://docs.aiaiai.cl"
+    languages: ["es", "en"]
+    formats: ["web", "pdf", "video"]
+  
+  training:
+    onboarding_hours: 2
+    advanced_training_hours: 8
+    certification_available: true
+  
+  community:
+    slack_workspace: "https://aiaiai.slack.com"
+    forum: "https://community.aiaiai.cl"
+    github: "https://github.com/aiaiai"
+  
+  contact:
+    email: "support@aiaiai.cl"
+    phone: "+56 9 1234 5678"
+    whatsapp: "+56 9 1234 5678"
+    response_time_hours: 4

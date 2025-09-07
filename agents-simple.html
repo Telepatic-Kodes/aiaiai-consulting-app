@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIAIAI Consulting - AI Agents</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #3b82f6;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #3b82f6;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+        }
+
+        .btn-warning {
+            background: #d97706;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #b45309;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Main Content */
+        .main {
+            padding: 3rem 0;
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-cols-1 { grid-template-columns: 1fr; }
+        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Agent Card */
+        .agent-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .agent-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+
+        .agent-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-beta {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-development {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .agent-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .agent-description {
+            color: #64748b;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .agent-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .agent-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .filter-select {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.875rem;
+            min-width: 120px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 0.5rem 0;
+            z-index: 100;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem;
+            text-decoration: none;
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 500;
+            flex: 1;
+            transition: color 0.2s;
+        }
+
+        .mobile-nav-item.active {
+            color: #3b82f6;
+        }
+
+        .mobile-nav-item svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #1e293b;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+        }
+
+        .mobile-menu-toggle:hover {
+            background: #f1f5f9;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .grid-cols-2,
+            .grid-cols-3,
+            .grid-cols-4 {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .main {
+                padding: 2rem 0;
+                padding-bottom: 5rem; /* Space for mobile nav */
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .agent-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .agent-actions {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .grid-cols-3,
+            .grid-cols-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Utilities */
+        .text-center { text-align: center; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .text-3xl { font-size: 1.875rem; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">AI</div>
+                <span>AIAIAI Consulting</span>
+            </div>
+
+            <ul class="nav-links">
+                <li><a href="dashboard-simple.html">Dashboard</a></li>
+                <li><a href="agents-simple.html" class="active">Agents</a></li>
+                <li><a href="clients-simple.html">Clients</a></li>
+                <li><a href="projects-simple.html">Projects</a></li>
+                <li><a href="reports-simple.html">Analytics</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="mobile-menu-toggle">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                <button class="btn btn-primary">Add Agent</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="animate-fadeInUp">AI Agents Platform</h1>
+            <p class="animate-fadeInUp">Automate your business processes with specialized AI agents designed for LATAM entrepreneurs</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card animate-fadeInUp">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-value">6</div>
+                    <div class="stat-label">Active Agents</div>
+                </div>
+
+                <div class="stat-card animate-fadeInUp">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-value">1,247</div>
+                    <div class="stat-label">Tasks Completed</div>
+                </div>
+
+                <div class="stat-card animate-fadeInUp">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-value">98.5%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+
+                <div class="stat-card animate-fadeInUp">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-value">2.3s</div>
+                    <div class="stat-label">Avg Response Time</div>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select class="filter-select">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="beta">Beta</option>
+                            <option value="development">Development</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Category</label>
+                        <select class="filter-select">
+                            <option value="all">All Categories</option>
+                            <option value="sales">Sales</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="support">Support</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Performance</label>
+                        <select class="filter-select">
+                            <option value="all">All Performance</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Search</label>
+                        <input type="text" class="filter-select" placeholder="Search agents...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agents Grid -->
+            <div class="grid grid-cols-3">
+                <!-- Lead Scorer Agent -->
+                <div class="card agent-card animate-fadeInUp">
+                    <div class="agent-header">
+                        <div class="agent-icon">LS</div>
+                        <div class="agent-status status-active">Active</div>
+                    </div>
+                    <h3 class="agent-title">Lead Scorer</h3>
+                    <p class="agent-description">Automatically scores and prioritizes leads based on engagement, demographics, and behavior patterns.</p>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">847</div>
+                            <div class="metric-label">Leads Scored</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">94%</div>
+                            <div class="metric-label">Accuracy</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">2.1s</div>
+                            <div class="metric-label">Avg Time</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="btn btn-primary btn-sm">Configure</button>
+                        <button class="btn btn-secondary btn-sm">View Logs</button>
+                    </div>
+                </div>
+
+                <!-- Proposal Builder Agent -->
+                <div class="card agent-card animate-fadeInUp">
+                    <div class="agent-header">
+                        <div class="agent-icon">PB</div>
+                        <div class="agent-status status-active">Active</div>
+                    </div>
+                    <h3 class="agent-title">Proposal Builder</h3>
+                    <p class="agent-description">Generates customized business proposals using client data and industry best practices.</p>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">156</div>
+                            <div class="metric-label">Proposals</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">89%</div>
+                            <div class="metric-label">Acceptance</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">4.2s</div>
+                            <div class="metric-label">Avg Time</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="btn btn-primary btn-sm">Configure</button>
+                        <button class="btn btn-secondary btn-sm">View Logs</button>
+                    </div>
+                </div>
+
+                <!-- Meeting Summarizer Agent -->
+                <div class="card agent-card animate-fadeInUp">
+                    <div class="agent-header">
+                        <div class="agent-icon">MS</div>
+                        <div class="agent-status status-active">Active</div>
+                    </div>
+                    <h3 class="agent-title">Meeting Summarizer</h3>
+                    <p class="agent-description">Automatically transcribes and summarizes meeting content with action items and key decisions.</p>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">234</div>
+                            <div class="metric-label">Meetings</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">96%</div>
+                            <div class="metric-label">Accuracy</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">1.8s</div>
+                            <div class="metric-label">Avg Time</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="btn btn-primary btn-sm">Configure</button>
+                        <button class="btn btn-secondary btn-sm">View Logs</button>
+                    </div>
+                </div>
+
+                <!-- CRM Updater Agent -->
+                <div class="card agent-card animate-fadeInUp">
+                    <div class="agent-header">
+                        <div class="agent-icon">CU</div>
+                        <div class="agent-status status-beta">Beta</div>
+                    </div>
+                    <h3 class="agent-title">CRM Updater</h3>
+                    <p class="agent-description">Automatically updates CRM records with new client information and interaction history.</p>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">1,423</div>
+                            <div class="metric-label">Updates</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">91%</div>
+                            <div class="metric-label">Accuracy</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">0.9s</div>
+                            <div class="metric-label">Avg Time</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="btn btn-warning btn-sm">Configure</button>
+                        <button class="btn btn-secondary btn-sm">View Logs</button>
+                    </div>
+                </div>
+
+                <!-- Follow-up Scheduler Agent -->
+                <div class="card agent-card animate-fadeInUp">
+                    <div class="agent-header">
+                        <div class="agent-icon">FS</div>
+                        <div class="agent-status status-active">Active</div>
+                    </div>
+                    <h3 class="agent-title">Follow-up Scheduler</h3>
+                    <p class="agent-description">Intelligently schedules follow-up communications based on client behavior and preferences.</p>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">567</div>
+                            <div class="metric-label">Scheduled</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">87%</div>
+                            <div class="metric-label">Response</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">3.1s</div>
+                            <div class="metric-label">Avg Time</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="btn btn-primary btn-sm">Configure</button>
+                        <button class="btn btn-secondary btn-sm">View Logs</button>
+                    </div>
+                </div>
+
+                <!-- Invoice Generator Agent -->
+                <div class="card agent-card animate-fadeInUp">
+                    <div class="agent-header">
+                        <div class="agent-icon">IG</div>
+                        <div class="agent-status status-development">Development</div>
+                    </div>
+                    <h3 class="agent-title">Invoice Generator</h3>
+                    <p class="agent-description">Automatically generates and sends invoices based on project milestones and time tracking.</p>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">89</div>
+                            <div class="metric-label">Invoices</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">78%</div>
+                            <div class="metric-label">Accuracy</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">5.4s</div>
+                            <div class="metric-label">Avg Time</div>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="btn btn-secondary btn-sm">Configure</button>
+                        <button class="btn btn-secondary btn-sm">View Logs</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-nav">
+        <a href="dashboard-simple.html" class="mobile-nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z"></path>
+            </svg>
+            <span>Dashboard</span>
+        </a>
+        <a href="agents-simple.html" class="mobile-nav-item active">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+            <span>Agents</span>
+        </a>
+        <a href="clients-simple.html" class="mobile-nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            <span>Clients</span>
+        </a>
+        <a href="projects-simple.html" class="mobile-nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+            </svg>
+            <span>Projects</span>
+        </a>
+        <a href="reports-simple.html" class="mobile-nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            <span>Analytics</span>
+        </a>
+    </div>
+
+    <script>
+        // Simple mobile interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add touch feedback to cards
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                card.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+
+            // Add touch feedback to buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                button.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+
+            // Filter functionality
+            const filterSelects = document.querySelectorAll('.filter-select');
+            filterSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    // Here you would implement the actual filtering logic
+                    console.log('Filter changed:', this.value);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

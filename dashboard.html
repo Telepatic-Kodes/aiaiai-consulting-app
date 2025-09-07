@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIAIAI Consulting - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth.js"></script>
+    <script src="notifications.js"></script>
+    <script src="api.js"></script>
+    <script src="theme.js"></script>
+    <script src="search.js"></script>
+    <script src="shortcuts.js"></script>
+    <script src="animations.js"></script>
+    <script src="loading.js"></script>
+    <script src="accessibility.js"></script>
+    <script src="responsive.js"></script>
+    <script src="typography.js"></script>
+    <style>
+        /* Custom Dashboard Styles */
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            box-shadow: var(--shadow);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .metric-value {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .metric-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-1);
+        }
+
+        .metric-change {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+
+        .metric-change.positive {
+            color: var(--success);
+        }
+
+        .metric-change.negative {
+            color: var(--error);
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-8);
+            box-shadow: var(--shadow);
+            transition: all var(--transition-normal);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-4);
+            font-size: var(--font-size-2xl);
+        }
+
+        .chart-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            box-shadow: var(--shadow);
+            margin-bottom: var(--space-6);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: var(--space-6);
+        }
+
+        .chart-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+        }
+
+        .recent-activity {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            box-shadow: var(--shadow);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-4) 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-50);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .activity-time {
+            font-size: var(--font-size-xs);
+            color: var(--text-tertiary);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .status-badge.active {
+            background: var(--success);
+            color: white;
+        }
+
+        .status-badge.pending {
+            background: var(--warning);
+            color: white;
+        }
+
+        .status-badge.inactive {
+            background: var(--error);
+            color: white;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+            margin-top: var(--space-6);
+        }
+
+        .quick-action {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            text-align: center;
+            transition: all var(--transition-normal);
+            cursor: pointer;
+        }
+
+        .quick-action:hover {
+            background: var(--primary-50);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .quick-action-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-3);
+            color: white;
+        }
+
+        .quick-action-title {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 0;
+                text-align: center;
+            }
+            
+            .metric-card {
+                margin-bottom: var(--space-4);
+            }
+            
+            .feature-card {
+                margin-bottom: var(--space-4);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="bg-surface border-b border-border sticky top-0 z-50">
+        <div class="container">
+            <nav class="flex items-center justify-between py-4">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">AI</span>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-primary">AIAIAI Consulting</h1>
+                        <p class="text-sm text-secondary">World-Class Engineering</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="dashboard.html" class="text-primary font-medium border-b-2 border-primary pb-1">Dashboard</a>
+                    <a href="agents.html" class="text-secondary hover:text-primary transition-colors">Agentes</a>
+                    <a href="clients.html" class="text-secondary hover:text-primary transition-colors">Clientes</a>
+                    <a href="projects.html" class="text-secondary hover:text-primary transition-colors">Proyectos</a>
+                    <a href="reports.html" class="text-secondary hover:text-primary transition-colors">Reportes</a>
+                </div>
+
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 text-secondary hover:text-primary transition-colors" title="Búsqueda Global (Ctrl+K)">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                    <button class="p-2 text-secondary hover:text-primary transition-colors" title="Cambiar Tema">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-medium">A</span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Bienvenido a AIAIAI Consulting</h1>
+                <p class="text-xl md:text-2xl opacity-90 mb-8">Tu plataforma de consultoría de clase mundial para emprendedores LATAM</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button class="btn btn-primary btn-lg">Comenzar Ahora</button>
+                    <button class="btn btn-outline btn-lg" style="color: white; border-color: white;">Ver Demo</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="metric-card animate-slideInUp">
+                <div class="metric-label">Revenue Total</div>
+                <div class="metric-value">$172,000</div>
+                <div class="metric-change positive">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    +$4,200 vs mes anterior
+                </div>
+            </div>
+
+            <div class="metric-card animate-slideInUp" style="animation-delay: 0.1s;">
+                <div class="metric-label">Clientes Activos</div>
+                <div class="metric-value">24</div>
+                <div class="metric-change positive">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    +3 nuevos clientes
+                </div>
+            </div>
+
+            <div class="metric-card animate-slideInUp" style="animation-delay: 0.2s;">
+                <div class="metric-label">Proyectos Activos</div>
+                <div class="metric-value">12</div>
+                <div class="metric-change negative">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    -1 proyecto
+                </div>
+            </div>
+
+            <div class="metric-card animate-slideInUp" style="animation-delay: 0.3s;">
+                <div class="metric-label">Utilización del Equipo</div>
+                <div class="metric-value">87%</div>
+                <div class="metric-change positive">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    +5% eficiencia
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div class="feature-card animate-slideInLeft">
+                <div class="feature-icon">🚀</div>
+                <h3 class="text-xl font-semibold mb-3">Plataforma de Agentes IA</h3>
+                <p class="text-secondary mb-4">Automatiza tus procesos de negocio con agentes de IA especializados para scoring de leads, construcción de propuestas y gestión de clientes.</p>
+                <button class="btn btn-primary">Explorar Agentes</button>
+            </div>
+
+            <div class="feature-card animate-slideInUp" style="animation-delay: 0.1s;">
+                <div class="feature-icon">📊</div>
+                <h3 class="text-xl font-semibold mb-3">Dashboard de Analytics</h3>
+                <p class="text-secondary mb-4">Obtén insights sobre el rendimiento de tu negocio con analytics en tiempo real, seguimiento de revenue y métricas de satisfacción del cliente.</p>
+                <button class="btn btn-primary">Ver Analytics</button>
+            </div>
+
+            <div class="feature-card animate-slideInRight" style="animation-delay: 0.2s;">
+                <div class="feature-icon">🌎</div>
+                <h3 class="text-xl font-semibold mb-3">Enfoque LATAM</h3>
+                <p class="text-secondary mb-4">Construido específicamente para emprendedores latinoamericanos con integraciones locales, soporte WhatsApp y prácticas de negocio regionales.</p>
+                <button class="btn btn-primary">Saber Más</button>
+            </div>
+        </div>
+
+        <!-- Charts and Activity -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Revenue Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Revenue por Mes</h3>
+                    <span class="status-badge active">Últimos 6 meses</span>
+                </div>
+                <div class="h-64 bg-gradient-to-r from-primary-50 to-accent-50 rounded-lg flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">📈</div>
+                        <p class="text-secondary">Gráfico de Revenue</p>
+                        <p class="text-sm text-tertiary">Jul: $45K → Dic: $72K</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <h3 class="text-lg font-semibold mb-6">Actividad Reciente</h3>
+                <div class="space-y-4">
+                    <div class="activity-item">
+                        <div class="activity-icon">👤</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Nuevo cliente agregado: María González</div>
+                            <div class="activity-time">Hace 2 horas</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">📊</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Reporte mensual generado</div>
+                            <div class="activity-time">Hace 4 horas</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">🤖</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Lead Scorer procesó 47 nuevos leads</div>
+                            <div class="activity-time">Hace 6 horas</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">📝</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Proposal Builder completó 3 propuestas</div>
+                            <div class="activity-time">Hace 8 horas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mb-8">
+            <h3 class="text-2xl font-bold mb-6">Acciones Rápidas</h3>
+            <div class="quick-actions">
+                <div class="quick-action" onclick="window.location.href='agents.html'">
+                    <div class="quick-action-icon">🤖</div>
+                    <div class="quick-action-title">Configurar Agente</div>
+                </div>
+                <div class="quick-action" onclick="window.location.href='clients.html'">
+                    <div class="quick-action-icon">👥</div>
+                    <div class="quick-action-title">Agregar Cliente</div>
+                </div>
+                <div class="quick-action" onclick="window.location.href='projects.html'">
+                    <div class="quick-action-icon">📋</div>
+                    <div class="quick-action-title">Nuevo Proyecto</div>
+                </div>
+                <div class="quick-action" onclick="window.location.href='reports.html'">
+                    <div class="quick-action-icon">📊</div>
+                    <div class="quick-action-title">Generar Reporte</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="text-center py-12 bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl">
+            <h2 class="text-3xl font-bold mb-4">¿Listo para Transformar tu Negocio?</h2>
+            <p class="text-xl text-secondary mb-8">Únete al futuro de la consultoría con automatización impulsada por IA</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="btn btn-primary btn-lg">Comenzar Hoy</button>
+                <button class="btn btn-outline btn-lg">Programar Demo</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-8 mt-16">
+        <div class="container">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold">AI</span>
+                        </div>
+                        <span class="font-bold">AIAIAI Consulting</span>
+                    </div>
+                    <p class="text-gray-400">Consultoría de clase mundial para emprendedores LATAM</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Producto</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Agentes IA</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Analytics</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Integraciones</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Soporte</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Documentación</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contacto</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Estado del Sistema</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Empresa</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Acerca de</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Carreras</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacidad</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 AIAIAI Consulting. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

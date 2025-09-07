@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIAIAI Consulting - Executive Dashboard</title>
+    <link rel="stylesheet" href="styles-worldclass.css">
+    <script src="auth.js"></script>
+    <script src="notifications.js"></script>
+    <script src="api.js"></script>
+    <script src="theme.js"></script>
+    <script src="search.js"></script>
+    <script src="shortcuts.js"></script>
+    <script src="animations.js"></script>
+    <script src="loading.js"></script>
+    <script src="accessibility.js"></script>
+    <script src="responsive.js"></script>
+    <script src="typography.js"></script>
+    <style>
+        /* World-Class Dashboard Styles */
+        .executive-header {
+            background: linear-gradient(135deg, var(--primary-900) 0%, var(--primary-800) 50%, var(--primary-700) 100%);
+            color: var(--text-inverse);
+            padding: var(--space-24) 0 var(--space-20);
+            margin-bottom: var(--space-16);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .executive-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .executive-header h1 {
+            color: var(--text-inverse);
+            font-size: var(--text-6xl);
+            font-weight: var(--font-bold);
+            letter-spacing: -0.05em;
+            margin-bottom: var(--space-6);
+            position: relative;
+            z-index: 1;
+        }
+
+        .executive-header p {
+            color: var(--neutral-200);
+            font-size: var(--text-xl);
+            font-weight: var(--font-normal);
+            max-width: 600px;
+            line-height: var(--leading-relaxed);
+            position: relative;
+            z-index: 1;
+        }
+
+        .metric-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-600), var(--accent-500));
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--border-secondary);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: var(--space-6);
+        }
+
+        .metric-title {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .metric-value {
+            font-size: var(--text-5xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            line-height: var(--leading-none);
+            margin-bottom: var(--space-3);
+        }
+
+        .metric-change {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        .metric-change.positive {
+            color: var(--success-600);
+        }
+
+        .metric-change.negative {
+            color: var(--error-600);
+        }
+
+        .metric-change.neutral {
+            color: var(--text-tertiary);
+        }
+
+        .feature-section {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-10);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-200), transparent);
+        }
+
+        .feature-section:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--border-secondary);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-6);
+            color: var(--primary-600);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .feature-title {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
+        }
+
+        .feature-description {
+            font-size: var(--text-base);
+            color: var(--text-secondary);
+            line-height: var(--leading-relaxed);
+            margin-bottom: var(--space-8);
+        }
+
+        .chart-container {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-10);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-10);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-200), transparent);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+            padding-bottom: var(--space-6);
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .chart-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .chart-content {
+            height: 400px;
+            background: linear-gradient(135deg, var(--neutral-50), var(--neutral-100));
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            font-size: var(--text-lg);
+            font-weight: var(--font-medium);
+            border: 1px solid var(--border-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(0,0,0,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.5;
+        }
+
+        .activity-list {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-10);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activity-list::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-200), transparent);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-6) 0;
+            border-bottom: 1px solid var(--border-primary);
+            transition: all var(--transition-fast);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item:hover {
+            background: var(--bg-secondary);
+            margin: 0 calc(var(--space-4) * -1);
+            padding-left: var(--space-4);
+            padding-right: var(--space-4);
+            border-radius: var(--radius-lg);
+        }
+
+        .activity-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-600);
+            flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .activity-time {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-6);
+            margin-top: var(--space-10);
+        }
+
+        .quick-action {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            text-align: center;
+            transition: all var(--transition-normal);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-200), transparent);
+        }
+
+        .quick-action:hover {
+            background: linear-gradient(135deg, var(--primary-50), var(--accent-50));
+            border-color: var(--primary-200);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .quick-action-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-4);
+            color: var(--text-inverse);
+            box-shadow: var(--shadow-md);
+        }
+
+        .quick-action-title {
+            font-size: var(--text-base);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: var(--font-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .status-indicator.active {
+            background: var(--success-100);
+            color: var(--success-700);
+        }
+
+        .status-indicator.pending {
+            background: var(--warning-100);
+            color: var(--warning-700);
+        }
+
+        .status-indicator.inactive {
+            background: var(--error-100);
+            color: var(--error-700);
+        }
+
+        .navigation {
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border-primary);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .nav-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-weight: var(--font-bold);
+            font-size: var(--text-lg);
+        }
+
+        .nav-logo-text {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .nav-logo-subtitle {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            color: var(--primary-600);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-600);
+            border-radius: var(--radius-full);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .nav-action {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .nav-action:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-user {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-weight: var(--font-semibold);
+            font-size: var(--text-sm);
+        }
+
+        @media (max-width: 768px) {
+            .executive-header {
+                padding: var(--space-16) 0 var(--space-12);
+                text-align: center;
+            }
+            
+            .executive-header h1 {
+                font-size: var(--text-4xl);
+            }
+            
+            .metric-card {
+                margin-bottom: var(--space-6);
+            }
+            
+            .feature-section {
+                margin-bottom: var(--space-6);
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- World-Class Navigation -->
+    <nav class="navigation">
+        <div class="container">
+            <div class="flex items-center justify-between py-4">
+                <!-- Professional Logo -->
+                <div class="nav-logo">
+                    <div class="nav-logo-icon">AI</div>
+                    <div>
+                        <div class="nav-logo-text">AIAIAI Consulting</div>
+                        <div class="nav-logo-subtitle">Executive Platform</div>
+                    </div>
+                </div>
+
+                <!-- Professional Navigation -->
+                <div class="nav-links">
+                    <a href="dashboard-worldclass.html" class="nav-link active">Dashboard</a>
+                    <a href="agents-worldclass.html" class="nav-link">Agents</a>
+                    <a href="clients-worldclass.html" class="nav-link">Clients</a>
+                    <a href="projects-worldclass.html" class="nav-link">Projects</a>
+                    <a href="reports-worldclass.html" class="nav-link">Analytics</a>
+                </div>
+
+                <!-- Professional Actions -->
+                <div class="nav-actions">
+                    <div class="nav-action" title="Global Search">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="nav-action" title="Theme Toggle">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </div>
+                    <div class="nav-user">A</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Executive Header Section -->
+    <section class="executive-header">
+        <div class="container">
+            <div class="animate-slideInUp">
+                <h1>Executive Dashboard</h1>
+                <p>Comprehensive business intelligence and performance analytics for strategic decision making</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Key Performance Indicators -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+            <div class="metric-card animate-slideInUp">
+                <div class="metric-header">
+                    <div class="metric-title">Total Revenue</div>
+                </div>
+                <div class="metric-value">$172,000</div>
+                <div class="metric-change positive">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    +$4,200 vs previous month
+                </div>
+            </div>
+
+            <div class="metric-card animate-slideInUp" style="animation-delay: 0.1s;">
+                <div class="metric-header">
+                    <div class="metric-title">Active Clients</div>
+                </div>
+                <div class="metric-value">24</div>
+                <div class="metric-change positive">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    +3 new clients
+                </div>
+            </div>
+
+            <div class="metric-card animate-slideInUp" style="animation-delay: 0.2s;">
+                <div class="metric-header">
+                    <div class="metric-title">Active Projects</div>
+                </div>
+                <div class="metric-value">12</div>
+                <div class="metric-change negative">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    -1 project
+                </div>
+            </div>
+
+            <div class="metric-card animate-slideInUp" style="animation-delay: 0.3s;">
+                <div class="metric-header">
+                    <div class="metric-title">Team Utilization</div>
+                </div>
+                <div class="metric-value">87%</div>
+                <div class="metric-change positive">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    +5% efficiency
+                </div>
+            </div>
+        </div>
+
+        <!-- Strategic Features -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-16">
+            <div class="feature-section animate-slideInLeft">
+                <div class="feature-icon">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <h3 class="feature-title">AI Agent Platform</h3>
+                <p class="feature-description">Automate business processes with specialized AI agents for lead scoring, proposal building, and client management.</p>
+                <button class="btn btn-primary">Explore Agents</button>
+            </div>
+
+            <div class="feature-section animate-slideInUp" style="animation-delay: 0.1s;">
+                <div class="feature-icon">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Analytics Dashboard</h3>
+                <p class="feature-description">Gain insights into business performance with real-time analytics, revenue tracking, and client satisfaction metrics.</p>
+                <button class="btn btn-primary">View Analytics</button>
+            </div>
+
+            <div class="feature-section animate-slideInRight" style="animation-delay: 0.2s;">
+                <div class="feature-icon">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="feature-title">LATAM Focus</h3>
+                <p class="feature-description">Built specifically for Latin American entrepreneurs with local integrations, WhatsApp support, and regional business practices.</p>
+                <button class="btn btn-primary">Learn More</button>
+            </div>
+        </div>
+
+        <!-- Charts and Activity -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16">
+            <!-- Revenue Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Monthly Revenue</h3>
+                    <span class="status-indicator active">Last 6 months</span>
+                </div>
+                <div class="chart-content">
+                    Revenue Analytics Chart
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-list">
+                <h3 class="text-xl font-semibold mb-8">Recent Activity</h3>
+                <div class="space-y-4">
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">New client added: María González</div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Monthly report generated</div>
+                            <div class="activity-time">4 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                            </svg>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Lead Scorer processed 47 new leads</div>
+                            <div class="activity-time">6 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Proposal Builder completed 3 proposals</div>
+                            <div class="activity-time">8 hours ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mb-16">
+            <h3 class="text-3xl font-semibold mb-8">Quick Actions</h3>
+            <div class="quick-actions">
+                <a href="agents-worldclass.html" class="quick-action">
+                    <div class="quick-action-icon">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <div class="quick-action-title">Configure Agent</div>
+                </a>
+                <a href="clients-worldclass.html" class="quick-action">
+                    <div class="quick-action-icon">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="quick-action-title">Add Client</div>
+                </a>
+                <a href="projects-worldclass.html" class="quick-action">
+                    <div class="quick-action-icon">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                    </div>
+                    <div class="quick-action-title">New Project</div>
+                </a>
+                <a href="reports-worldclass.html" class="quick-action">
+                    <div class="quick-action-icon">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <div class="quick-action-title">Generate Report</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="text-center py-20 bg-gradient-to-br from-neutral-50 to-neutral-100 rounded-3xl">
+            <h2 class="text-4xl font-bold mb-6">Ready to Transform Your Business?</h2>
+            <p class="text-xl text-secondary mb-10 max-w-3xl mx-auto">Join the future of consulting with AI-powered automation and world-class analytics</p>
+            <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                <button class="btn btn-primary btn-xl">Get Started</button>
+                <button class="btn btn-outline btn-xl">Schedule Demo</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- World-Class Footer -->
+    <footer class="bg-neutral-900 text-white py-16 mt-24">
+        <div class="container">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+                <div>
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+                            <span class="text-white font-bold">AI</span>
+                        </div>
+                        <span class="font-semibold text-lg">AIAIAI Consulting</span>
+                    </div>
+                    <p class="text-neutral-400 leading-relaxed">World-class consulting for LATAM entrepreneurs</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-6">Product</h4>
+                    <ul class="space-y-3 text-neutral-400">
+                        <li><a href="#" class="hover:text-white transition-colors">AI Agents</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Analytics</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Integrations</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-6">Support</h4>
+                    <ul class="space-y-3 text-neutral-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">System Status</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-6">Company</h4>
+                    <ul class="space-y-3 text-neutral-400">
+                        <li><a href="#" class="hover:text-white transition-colors">About</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-neutral-700 mt-12 pt-8 text-center text-neutral-400">
+                <p>&copy; 2025 AIAIAI Consulting. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
