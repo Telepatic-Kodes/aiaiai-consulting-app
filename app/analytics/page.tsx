@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { MetricCard } from '@/components/dashboard/MetricCard';
+import { StandardMetricCard } from '@/components/dashboard/StandardMetricCard';
 import { Chart } from '@/components/dashboard/Chart';
 import { 
   BarChart3, 
@@ -112,7 +112,7 @@ export default function AnalyticsPage() {
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {metrics.map((metric, index) => (
-          <MetricCard
+          <StandardMetricCard
             key={index}
             title={metric.title}
             value={metric.value}
@@ -322,5 +322,6 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+
 
 

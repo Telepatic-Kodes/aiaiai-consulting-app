@@ -1,169 +1,179 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Bell, X, CheckCircle, AlertCircle, Info, XCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
-export interface Notification {
+interface Notification {
   id: string;
   type: 'success' | 'error' | 'warning' | 'info';
   title: string;
   message: string;
   timestamp: Date;
   read: boolean;
-  persistent?: boolean;
-  actions?: NotificationAction[];
-}
-
-export interface NotificationAction {
-  label: string;
-  action: () => void;
-  variant?: 'primary' | 'secondary';
 }
 
 interface NotificationSystemProps {
   className?: string;
 }
 
-const NotificationSystem: React.FC<NotificationSystemProps> = ({ className }) => {
+export function NotificationSystem({ className }: NotificationSystemProps) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
 
   // Simular notificaciones en tiempo real
   useEffect(() => {
-    const interval = setInterval(() => {
-      const newNotification: Notification = {
-        id: `notification-${Date.now()}`,
-        type: ['success', 'error', 'warning', 'info'][Math.floor(Math.random() * 4)] as any,
-        title: 'Nueva Actualización',
-        message: 'Se ha actualizado el proyecto "Estrategia Digital 2024"',
-        timestamp: new Date(),
-        read: false,
-        actions: [
-          {
-            label: 'Ver',
-            action: () => console.log('Ver proyecto'),
-            variant: 'primary'
-          },
-          {
-            label: 'Marcar como leído',
-            action: () => markAsRead(`notification-${Date.now()}`),
-            variant: 'secondary'
-          }
-        ]
+    const generateNotification = () => {
+      const types: Notification['type'][] = ['success', 'info', 'warning'];
+      const type = types[Math.floor(Math.random() * types.length)];
+      
+      const notificationTemplates = {
+        success: [
+          { title: 'Agente Creado', message: 'Nuevo agente de IA creado exitosamente' },
+          { title: 'Cliente Agregado', message: 'Cliente nuevo agregado al sistema' },
+          { title: 'Reporte Generado', message: 'Reporte mensual generado correctamente' },
+        ],
+        info: [
+          { title: 'Actualización Disponible', message: 'Nueva versión del sistema disponible' },
+          { title: 'Mantenimiento Programado', message: 'Mantenimiento programado para mañana' },
+          { title: 'Nuevo Feature', message: 'Nueva funcionalidad de análisis disponible' },
+        ],
+        warning: [
+          { title: 'Alto Uso de CPU', message: 'Uso de CPU por encima del 80%' },
+          { title: 'Espacio en Disco', message: 'Espacio en disco bajo (15% restante)' },
+          { title: 'Conexión Lenta', message: 'Velocidad de conexión reducida detectada' },
+        ],
       };
 
-      addNotification(newNotification);
-    }, 30000); // Cada 30 segundos
+      const template = notificationTemplates[type][Math.floor(Math.random() * notificationTemplates[type].length)];
+      
+      const newNotification: Notification = {
+        id: Date.now().toString(),
+        type,
+        title: template.title,
+        message: template.message,
+        timestamp: new Date(),
+        read: false,
+      };
 
+      setNotifications(prev => [newNotification, ...prev.slice(0, 9)]); // Mantener máximo 10
+    };
+
+    // Generar notificación cada 30-60 segundos
+    const interval = setInterval(generateNotification, Math.random() * 30000 + 30000);
+    
     return () => clearInterval(interval);
   }, []);
 
-  const addNotification = useCallback((notification: Notification) => {
-    setNotifications(prev => [notification, ...prev.slice(0, 49)]); // Máximo 50 notificaciones
-    setUnreadCount(prev => prev + 1);
-  }, []);
-
-  const markAsRead = useCallback((id: string) => {
+  const markAsRead = (id: string) => {
     setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === id ? { ...notif, read: true } : notif
+      prev.map(notification => 
+        notification.id === id 
+          ? { ...notification, read: true }
+          : notification
       )
     );
-    setUnreadCount(prev => Math.max(0, prev - 1));
-  }, []);
+  };
 
-  const markAllAsRead = useCallback(() => {
+  const markAllAsRead = () => {
     setNotifications(prev => 
-      prev.map(notif => ({ ...notif, read: true }))
+      prev.map(notification => ({ ...notification, read: true }))
     );
-    setUnreadCount(0);
-  }, []);
+  };
 
-  const removeNotification = useCallback((id: string) => {
-    setNotifications(prev => {
-      const notification = prev.find(n => n.id === id);
-      if (notification && !notification.read) {
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      }
-      return prev.filter(n => n.id !== id);
-    });
-  }, []);
+  const clearAll = () => {
+    setNotifications([]);
+  };
 
-  const getIcon = (type: Notification['type']) => {
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const getTypeIcon = (type: Notification['type']) => {
     switch (type) {
-      case 'success': return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'error': return <XCircle className="w-5 h-5 text-red-500" />;
-      case 'warning': return <AlertCircle className="w-5 h-5 text-yellow-500" />;
-      case 'info': return <Info className="w-5 h-5 text-blue-500" />;
+      case 'success':
+        return (
+          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        );
+      case 'error':
+        return (
+          <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        );
+      case 'warning':
+        return (
+          <svg className="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        );
+      case 'info':
+        return (
+          <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
     }
   };
 
-  const getTypeStyles = (type: Notification['type']) => {
+  const getTypeColor = (type: Notification['type']) => {
     switch (type) {
-      case 'success': return 'border-l-green-500 bg-green-50';
-      case 'error': return 'border-l-red-500 bg-red-50';
-      case 'warning': return 'border-l-yellow-500 bg-yellow-50';
-      case 'info': return 'border-l-blue-500 bg-blue-50';
+      case 'success': return 'border-l-green-500 bg-green-50 dark:bg-green-900/20';
+      case 'error': return 'border-l-red-500 bg-red-50 dark:bg-red-900/20';
+      case 'warning': return 'border-l-yellow-500 bg-yellow-50 dark:bg-yellow-900/20';
+      case 'info': return 'border-l-blue-500 bg-blue-50 dark:bg-blue-900/20';
     }
-  };
-
-  const formatTime = (date: Date) => {
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-    
-    if (minutes < 1) return 'Ahora';
-    if (minutes < 60) return `Hace ${minutes}m`;
-    if (minutes < 1440) return `Hace ${Math.floor(minutes / 60)}h`;
-    return date.toLocaleDateString();
   };
 
   return (
-    <div className={cn('relative', className)}>
-      {/* Bell Icon */}
+    <div className={cn("relative", className)}>
+      {/* Notification Bell */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+        className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
       >
-        <Bell className="w-6 h-6" />
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4.5 19.5L9 15H4l5-5V4l-5 5H9l-4.5 4.5z" />
+        </svg>
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-            {unreadCount > 99 ? '99+' : unreadCount}
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+            {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
-      {/* Notifications Panel */}
+      {/* Notification Panel */}
       {isOpen && (
-        <div className="absolute right-0 top-12 w-96 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
           {/* Header */}
-          <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">Notificaciones</h3>
-            <div className="flex items-center space-x-2">
-              {unreadCount > 0 && (
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Notificaciones</h3>
+              <div className="flex space-x-2">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    Marcar todas como leídas
+                  </button>
+                )}
                 <button
-                  onClick={markAllAsRead}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  onClick={clearAll}
+                  className="text-sm text-gray-500 hover:text-gray-700"
                 >
-                  Marcar todas como leídas
+                  Limpiar
                 </button>
-              )}
-              <button
-                onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              </div>
             </div>
           </div>
 
           {/* Notifications List */}
-          <div className="max-h-80 overflow-y-auto">
+          <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                <Bell className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <div className="p-4 text-center text-gray-500">
+                <svg className="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4.5 19.5L9 15H4l5-5V4l-5 5H9l-4.5 4.5z" />
+                </svg>
                 <p>No hay notificaciones</p>
               </div>
             ) : (
@@ -171,72 +181,45 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ className }) =>
                 <div
                   key={notification.id}
                   className={cn(
-                    'p-4 border-l-4 border-b border-gray-100 hover:bg-gray-50 transition-colors',
-                    getTypeStyles(notification.type),
-                    !notification.read && 'bg-blue-50'
+                    "p-4 border-l-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors",
+                    getTypeColor(notification.type),
+                    !notification.read && "bg-opacity-50"
                   )}
+                  onClick={() => markAsRead(notification.id)}
                 >
                   <div className="flex items-start space-x-3">
-                    {getIcon(notification.type)}
+                    <div className="flex-shrink-0 mt-0.5">
+                      {getTypeIcon(notification.type)}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-medium text-gray-900">
+                        <p className={cn(
+                          "text-sm font-medium",
+                          !notification.read ? "text-gray-900" : "text-gray-700"
+                        )}>
                           {notification.title}
-                        </h4>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs text-gray-500">
-                            {formatTime(notification.timestamp)}
-                          </span>
-                          <button
-                            onClick={() => removeNotification(notification.id)}
-                            className="p-1 hover:bg-gray-200 rounded"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </div>
+                        </p>
+                        {!notification.read && (
+                          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
+                        )}
                       </div>
                       <p className="text-sm text-gray-600 mt-1">
                         {notification.message}
                       </p>
-                      
-                      {/* Actions */}
-                      {notification.actions && notification.actions.length > 0 && (
-                        <div className="flex items-center space-x-2 mt-3">
-                          {notification.actions.map((action, index) => (
-                            <button
-                              key={index}
-                              onClick={action.action}
-                              className={cn(
-                                'text-xs px-3 py-1 rounded-full font-medium transition-colors',
-                                action.variant === 'primary'
-                                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                              )}
-                            >
-                              {action.label}
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                      <p className="text-xs text-gray-500 mt-2">
+                        {notification.timestamp.toLocaleTimeString('es-ES', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
                     </div>
                   </div>
                 </div>
               ))
             )}
           </div>
-
-          {/* Footer */}
-          {notifications.length > 0 && (
-            <div className="p-4 border-t border-gray-200 text-center">
-              <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                Ver todas las notificaciones
-              </button>
-            </div>
-          )}
         </div>
       )}
     </div>
   );
-};
-
-export default NotificationSystem;
+}

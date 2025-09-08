@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { MetricCard } from '@/components/dashboard/MetricCard';
+import { StandardMetricCard } from '@/components/dashboard/StandardMetricCard';
 import { 
   TrendingUp, 
   Users, 

@@ -1,7 +1,11 @@
+"use client";
+
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { useAuth } from '@/lib/auth-context';
+import AuthRedirect from '@/components/auth/AuthRedirect';
 import { 
   Mail, 
   Lock, 
@@ -23,6 +27,7 @@ import {
  * - Consistent with AIAIAI Consulting design system
  */
 export default function LoginPage() {
+  const { login, loading } = useAuth();
   const [formData, setFormData] = React.useState({
     email: '',
     password: ''
@@ -30,6 +35,15 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState('');
+
+  // Demo data for testing
+  const fillDemoData = () => {
+    setFormData({
+      email: 'carlos.rodriguez@techconsulting.cl',
+      password: 'DemoPassword123!'
+    });
+    setError('');
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -47,28 +61,24 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // TODO: Implement actual authentication logic
-      console.log('Login attempt:', formData);
+      const success = await login(formData.email, formData.password);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, accept any email/password
-      if (formData.email && formData.password) {
-        // Redirect to dashboard
-        window.location.href = '/dashboard';
+      if (success) {
+        // Redirect will be handled by AuthRedirect component
+        console.log('Login successful');
       } else {
-        setError('Por favor, completa todos los campos');
+        setError('Error al iniciar sesión. Verifica tus credenciales.');
       }
     } catch (err) {
-      setError('Error al iniciar sesión. Verifica tus credenciales.');
+      setError('Error al iniciar sesión. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-accent-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <AuthRedirect>
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-accent-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -96,6 +106,25 @@ export default function LoginPage() {
         {/* Login Form */}
         <Card>
           <CardContent className="p-8">
+            {/* Demo Data Button */}
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-blue-900">Datos Demo Disponibles</h3>
+                  <p className="text-xs text-blue-700">Usa las credenciales demo para probar la aplicación</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={fillDemoData}
+                  className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                >
+                  Usar Datos Demo
+                </Button>
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -256,5 +285,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+    </AuthRedirect>
   );
 }

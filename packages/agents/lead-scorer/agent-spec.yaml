@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: AgentSpec
+name: lead.scorer
+version: 1.0.0
+owner: AIAIAI Consulting
+responsibility: "Calificar y priorizar leads automáticamente basado en comportamiento y datos demográficos"
+description: "Agente especializado en análisis de leads que evalúa la probabilidad de conversión y asigna puntuaciones para optimizar el proceso de ventas"
+
+inputs:
+  - lead_data:
+      type: object
+      required: true
+      description: "Datos del lead incluyendo información de contacto, comportamiento web, y contexto"
+      schema:
+        contact_info:
+          type: object
+          properties:
+            name: { type: string }
+            email: { type: string }
+            phone: { type: string }
+            company: { type: string }
+            position: { type: string }
+        behavior_data:
+          type: object
+          properties:
+            page_views: { type: array }
+            time_on_site: { type: number }
+            downloads: { type: array }
+            email_opens: { type: number }
+            email_clicks: { type: number }
+        demographic_data:
+          type: object
+          properties:
+            industry: { type: string }
+            company_size: { type: string }
+            location: { type: string }
+            budget_range: { type: string }
+
+outputs:
+  - lead_score:
+      type: number
+      description: "Puntuación del lead de 0-100"
+      range: [0, 100]
+  - lead_grade:
+      type: string
+      description: "Grado del lead (A, B, C, D)"
+      enum: ["A", "B", "C", "D"]
+  - conversion_probability:
+      type: number
+      description: "Probabilidad de conversión en porcentaje"
+      range: [0, 100]
+  - recommended_actions:
+      type: array
+      description: "Acciones recomendadas para el lead"
+      items:
+        type: string
+  - next_follow_up:
+      type: string
+      description: "Fecha y tipo de seguimiento recomendado"
+
+policies:
+  mode: [auto, review, approve]
+  sla_seconds: 30
+  retry_attempts: 3
+  timeout_seconds: 60
+
+tools:
+  - crm.query
+  - email.analyze
+  - web.analytics
+  - calendar.schedule
+
+observability:
+  metrics:
+    - latency_ms
+    - tokens_used
+    - retry_count
+    - accuracy_score
+  logs: structured
+  alerts:
+    - high_latency: "> 5000ms"
+    - low_accuracy: "< 85%"
+    - high_error_rate: "> 5%"
+
+pricing:
+  base_price: 49
+  currency: "USD"
+  billing_period: "monthly"
+  usage_tiers:
+    - tier: "starter"
+      price: 49
+      included_leads: 1000
+      overage_rate: 0.05
+    - tier: "professional"
+      price: 99
+      included_leads: 5000
+      overage_rate: 0.03
+    - tier: "enterprise"
+      price: 199
+      included_leads: 20000
+      overage_rate: 0.02
+
+integration_requirements:
+  crm_systems:
+    - salesforce
+    - hubspot
+    - pipedrive
+  analytics_tools:
+    - google_analytics
+    - mixpanel
+    - hotjar
+  communication:
+    - email_marketing
+    - whatsapp_business
+    - slack
+
+latam_features:
+  - spanish_language_support
+  - local_timezone_handling
+  - regional_industry_classification
+  - local_currency_support
+  - whatsapp_integration

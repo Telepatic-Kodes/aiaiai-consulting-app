@@ -1,6 +1,9 @@
-import React from 'react';
-import { redirect } from 'next/navigation';
-import { AuthManager } from '@/lib/auth-manager';
+"use client";
+
+import React, { useEffect } from 'react';
+import { useAuth } from '@/lib/auth-context';
+import { useRouter } from 'next/navigation';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 /**
  * Home Page Component
@@ -12,12 +15,31 @@ import { AuthManager } from '@/lib/auth-manager';
  * - Consistent with AIAIAI Consulting design system
  */
 export default function HomePage() {
-  // Check authentication status
-  if (typeof window !== 'undefined') {
-    const authManager = new AuthManager();
-    if (authManager.isAuthenticated()) {
-      redirect('/dashboard');
+  const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      router.push('/dashboard-simple');
     }
+  }, [isAuthenticated, loading, router]);
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-gray-600">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render landing page if user is authenticated (will redirect)
+  if (isAuthenticated) {
+    return null;
   }
 
   return (

@@ -1,7 +1,10 @@
+"use client";
+
 import React from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
+import { cn } from '@/lib/utils';
 import { 
   MessageCircle, 
   Send, 

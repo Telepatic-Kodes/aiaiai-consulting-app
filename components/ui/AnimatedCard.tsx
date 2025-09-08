@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { cn } from '@/lib/utils';
 
 interface AnimatedCardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -10,23 +10,25 @@ interface AnimatedCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Animated Card Component
+ * 🚀 OPTIMIZED Animated Card Component
  * 
  * Features:
+ * - GPU-accelerated animations
+ * - Memoized for performance
  * - Smooth entrance animations
  * - Hover effects
  * - Directional animations
  * - Staggered delays
  * - Professional micro-interactions
  */
-export function AnimatedCard({ 
+export const AnimatedCard = memo<AnimatedCardProps>(({ 
   children, 
   className, 
   hover = true, 
   delay = 0,
   direction = 'up',
   ...props 
-}: AnimatedCardProps) {
+}) => {
   const directionClasses = {
     up: 'animate-slide-up',
     down: 'animate-slide-down',
@@ -53,4 +55,6 @@ export function AnimatedCard({
       {children}
     </div>
   );
-}
+});
+
+AnimatedCard.displayName = 'AnimatedCard';

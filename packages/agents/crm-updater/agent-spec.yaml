@@ -1,0 +1,146 @@
+apiVersion: v1
+kind: AgentSpec
+name: crm.updater
+version: 1.0.0
+owner: AIAIAI Consulting
+responsibility: "Sincronizar y actualizar automáticamente datos en sistemas CRM"
+description: "Agente especializado en mantenimiento de datos CRM que detecta cambios, elimina duplicados y mantiene la integridad de la información"
+
+inputs:
+  - crm_data:
+      type: object
+      required: true
+      description: "Datos del CRM a procesar"
+      schema:
+        contacts: { type: array }
+        companies: { type: array }
+        deals: { type: array }
+        activities: { type: array }
+  - update_rules:
+      type: object
+      required: false
+      description: "Reglas de actualización personalizadas"
+      schema:
+        field_mappings: { type: object }
+        validation_rules: { type: array }
+        merge_strategies: { type: object }
+  - data_sources:
+      type: array
+      required: false
+      description: "Fuentes de datos externas para sincronización"
+      items:
+        type: object
+        schema:
+          source_type: { type: string }
+          connection_config: { type: object }
+          sync_frequency: { type: string }
+
+outputs:
+  - updated_records:
+      type: object
+      description: "Registros actualizados en el CRM"
+      schema:
+        contacts_updated: { type: number }
+        companies_updated: { type: number }
+        deals_updated: { type: number }
+        activities_created: { type: number }
+  - duplicate_report:
+      type: object
+      description: "Reporte de duplicados encontrados y resueltos"
+      schema:
+        duplicates_found: { type: number }
+        duplicates_merged: { type: number }
+        conflicts_resolved: { type: number }
+  - data_quality_score:
+      type: number
+      description: "Puntuación de calidad de datos (0-100)"
+      range: [0, 100]
+  - sync_summary:
+      type: object
+      description: "Resumen de la sincronización"
+      schema:
+        total_records_processed: { type: number }
+        successful_updates: { type: number }
+        failed_updates: { type: number }
+        processing_time: { type: string }
+  - recommendations:
+      type: array
+      description: "Recomendaciones para mejorar la calidad de datos"
+      items:
+        type: string
+
+policies:
+  mode: [auto, review, approve]
+  sla_seconds: 90
+  retry_attempts: 3
+  timeout_seconds: 600
+
+tools:
+  - crm.sync
+  - data.validation
+  - duplicate.detection
+  - field.mapping
+  - data.cleansing
+
+observability:
+  metrics:
+    - sync_duration_ms
+    - records_processed
+    - data_quality_score
+    - error_rate
+  logs: structured
+  alerts:
+    - slow_sync: "> 600000ms"
+    - low_data_quality: "< 80%"
+    - high_error_rate: "> 5%"
+
+pricing:
+  base_price: 59
+  currency: "USD"
+  billing_period: "monthly"
+  usage_tiers:
+    - tier: "starter"
+      price: 59
+      included_records: 10000
+      overage_rate: 0.01
+    - tier: "professional"
+      price: 119
+      included_records: 50000
+      overage_rate: 0.008
+    - tier: "enterprise"
+      price: 239
+      included_records: 200000
+      overage_rate: 0.005
+
+integration_requirements:
+  crm_systems:
+    - salesforce
+    - hubspot
+    - pipedrive
+    - zoho_crm
+    - dynamics_365
+  data_sources:
+    - google_contacts
+    - linkedin_sales_navigator
+    - email_systems
+    - web_forms
+    - social_media
+  storage:
+    - google_sheets
+    - excel_files
+    - csv_files
+    - json_apis
+
+data_quality_features:
+  - duplicate_detection
+  - data_validation
+  - field_standardization
+  - missing_data_identification
+  - data_enrichment
+
+latam_features:
+  - spanish_data_processing
+  - local_phone_formats
+  - regional_address_validation
+  - local_business_classification
+  - cultural_data_handling

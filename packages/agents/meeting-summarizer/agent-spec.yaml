@@ -1,0 +1,151 @@
+apiVersion: v1
+kind: AgentSpec
+name: meeting.summarizer
+version: 1.0.0
+owner: AIAIAI Consulting
+responsibility: "Resumir reuniones automáticamente y extraer tareas accionables"
+description: "Agente especializado en análisis de transcripciones de reuniones que genera resúmenes estructurados y listas de tareas"
+
+inputs:
+  - meeting_transcript:
+      type: string
+      required: true
+      description: "Transcripción completa de la reunión"
+  - meeting_metadata:
+      type: object
+      required: false
+      description: "Metadatos de la reunión"
+      schema:
+        title: { type: string }
+        date: { type: string }
+        duration: { type: number }
+        participants: { type: array }
+        meeting_type: { type: string }
+  - context_data:
+      type: object
+      required: false
+      description: "Contexto adicional sobre el proyecto o cliente"
+      schema:
+        project_name: { type: string }
+        client_name: { type: string }
+        previous_meetings: { type: array }
+
+outputs:
+  - meeting_summary:
+      type: string
+      description: "Resumen ejecutivo de la reunión"
+  - key_points:
+      type: array
+      description: "Puntos clave discutidos"
+      items:
+        type: string
+  - action_items:
+      type: array
+      description: "Tareas extraídas de la reunión"
+      items:
+        type: object
+        schema:
+          task: { type: string }
+          assignee: { type: string }
+          due_date: { type: string }
+          priority: { type: string }
+          status: { type: string }
+  - decisions_made:
+      type: array
+      description: "Decisiones tomadas durante la reunión"
+      items:
+        type: object
+        schema:
+          decision: { type: string }
+          rationale: { type: string }
+          impact: { type: string }
+  - next_meeting:
+      type: object
+      description: "Información sobre la próxima reunión"
+      schema:
+        suggested_date: { type: string }
+        agenda_items: { type: array }
+        required_participants: { type: array }
+  - sentiment_analysis:
+      type: object
+      description: "Análisis de sentimientos de la reunión"
+      schema:
+        overall_sentiment: { type: string }
+        participant_sentiments: { type: object }
+        concerns_raised: { type: array }
+
+policies:
+  mode: [auto, review, approve]
+  sla_seconds: 60
+  retry_attempts: 3
+  timeout_seconds: 180
+
+tools:
+  - transcription.analyze
+  - nlp.process
+  - calendar.integrate
+  - task.management
+  - sentiment.analyze
+
+observability:
+  metrics:
+    - processing_time_ms
+    - tokens_used
+    - accuracy_score
+    - user_satisfaction
+  logs: structured
+  alerts:
+    - slow_processing: "> 180000ms"
+    - low_accuracy: "< 85%"
+    - high_error_rate: "> 3%"
+
+pricing:
+  base_price: 39
+  currency: "USD"
+  billing_period: "monthly"
+  usage_tiers:
+    - tier: "starter"
+      price: 39
+      included_minutes: 300
+      overage_rate: 0.15
+    - tier: "professional"
+      price: 79
+      included_minutes: 1000
+      overage_rate: 0.10
+    - tier: "enterprise"
+      price: 149
+      included_minutes: 5000
+      overage_rate: 0.08
+
+integration_requirements:
+  meeting_platforms:
+    - zoom
+    - teams
+    - google_meet
+    - webex
+  transcription_services:
+    - otter_ai
+    - rev
+    - trint
+  task_management:
+    - asana
+    - trello
+    - monday
+    - jira
+  calendar_systems:
+    - google_calendar
+    - outlook_calendar
+    - cal.com
+
+language_support:
+  - spanish
+  - english
+  - portuguese
+  - french
+
+latam_features:
+  - spanish_meeting_analysis
+  - local_business_terminology
+  - cultural_context_understanding
+  - regional_meeting_formats
+  - local_timezone_handling

@@ -1,0 +1,149 @@
+apiVersion: v1
+kind: AgentSpec
+name: proposal.builder
+version: 1.0.0
+owner: AIAIAI Consulting
+responsibility: "Generar propuestas comerciales personalizadas y cotizaciones basadas en requerimientos del cliente"
+description: "Agente especializado en creación de propuestas que analiza necesidades del cliente y genera documentos comerciales profesionales"
+
+inputs:
+  - client_profile:
+      type: object
+      required: true
+      description: "Perfil completo del cliente y su empresa"
+      schema:
+        company_info:
+          type: object
+          properties:
+            name: { type: string }
+            industry: { type: string }
+            size: { type: string }
+            location: { type: string }
+            website: { type: string }
+        contact_info:
+          type: object
+          properties:
+            name: { type: string }
+            position: { type: string }
+            email: { type: string }
+            phone: { type: string }
+        requirements:
+          type: object
+          properties:
+            project_type: { type: string }
+            timeline: { type: string }
+            budget_range: { type: string }
+            specific_needs: { type: array }
+  - meeting_notes:
+      type: string
+      required: true
+      description: "Transcripción o notas de la reunión con el cliente"
+  - project_scope:
+      type: object
+      required: false
+      description: "Alcance detallado del proyecto"
+      schema:
+        deliverables: { type: array }
+        timeline: { type: string }
+        resources: { type: array }
+        assumptions: { type: array }
+
+outputs:
+  - proposal_document:
+      type: string
+      description: "URL del documento de propuesta generado"
+      format: "pdf"
+  - executive_summary:
+      type: string
+      description: "Resumen ejecutivo de la propuesta"
+  - pricing_breakdown:
+      type: object
+      description: "Desglose detallado de precios"
+      schema:
+        total_cost: { type: number }
+        payment_terms: { type: string }
+        cost_breakdown: { type: array }
+  - timeline_proposal:
+      type: object
+      description: "Cronograma propuesto del proyecto"
+      schema:
+        phases: { type: array }
+        milestones: { type: array }
+        duration: { type: string }
+  - next_steps:
+      type: array
+      description: "Próximos pasos recomendados"
+
+policies:
+  mode: [auto, review, approve]
+  sla_seconds: 120
+  retry_attempts: 2
+  timeout_seconds: 300
+
+tools:
+  - docs.create
+  - drive.upload
+  - gmail.draft
+  - calendar.schedule
+  - pricing.calculate
+
+observability:
+  metrics:
+    - generation_time_ms
+    - tokens_used
+    - document_quality_score
+    - client_satisfaction
+  logs: structured
+  alerts:
+    - slow_generation: "> 300000ms"
+    - low_quality: "< 80%"
+    - high_rejection_rate: "> 15%"
+
+pricing:
+  base_price: 79
+  currency: "USD"
+  billing_period: "monthly"
+  usage_tiers:
+    - tier: "starter"
+      price: 79
+      included_proposals: 50
+      overage_rate: 2.00
+    - tier: "professional"
+      price: 149
+      included_proposals: 200
+      overage_rate: 1.50
+    - tier: "enterprise"
+      price: 299
+      included_proposals: 1000
+      overage_rate: 1.00
+
+integration_requirements:
+  document_tools:
+    - google_docs
+    - microsoft_word
+    - canva
+  storage:
+    - google_drive
+    - dropbox
+    - onedrive
+  communication:
+    - gmail
+    - outlook
+    - slack
+  crm_systems:
+    - salesforce
+    - hubspot
+
+templates:
+  - consulting_proposal
+  - software_development
+  - marketing_campaign
+  - training_program
+  - maintenance_contract
+
+latam_features:
+  - spanish_templates
+  - local_legal_requirements
+  - regional_pricing_models
+  - local_payment_methods
+  - cultural_adaptation

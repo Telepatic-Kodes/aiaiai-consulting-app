@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Chart } from '@/components/dashboard/Chart';
-import { MetricCard } from '@/components/dashboard/MetricCard';
+import { StandardMetricCard } from '@/components/dashboard/StandardMetricCard';
 import { 
   FileText, 
   Download, 
@@ -227,7 +227,7 @@ export default function ReportsPage() {
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {reportMetrics.map((metric, index) => (
-          <MetricCard
+          <StandardMetricCard
             key={index}
             title={metric.title}
             value={metric.value}

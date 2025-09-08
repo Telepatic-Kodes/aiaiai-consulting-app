@@ -37,7 +37,7 @@ export interface ChartProps {
 export const Chart: React.FC<ChartProps> = ({
   title,
   subtitle,
-  data,
+  data = [],
   type = 'line',
   height = 300,
   className,
@@ -46,8 +46,11 @@ export const Chart: React.FC<ChartProps> = ({
   showTrend = true,
   format = 'number',
 }) => {
-  const totalValue = data.reduce((sum, point) => sum + point.value, 0);
-  const previousTotal = data.reduce((sum, point) => sum + (point.change || 0), 0);
+  // Ensure data is always an array
+  const safeData = Array.isArray(data) ? data : [];
+  
+  const totalValue = safeData.reduce((sum, point) => sum + point.value, 0);
+  const previousTotal = safeData.reduce((sum, point) => sum + (point.change || 0), 0);
   const trend = totalValue > previousTotal ? 'up' : totalValue < previousTotal ? 'down' : 'neutral';
   const trendPercentage = previousTotal > 0 ? ((totalValue - previousTotal) / previousTotal) * 100 : 0;
 
@@ -154,14 +157,14 @@ export const Chart: React.FC<ChartProps> = ({
           </div>
           
           {/* Simulated chart bars for demo */}
-          {type === 'bar' && (
+          {type === 'bar' && safeData.length > 0 && (
             <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between space-x-2">
-              {data.slice(0, 6).map((point, index) => (
+              {safeData.slice(0, 6).map((point, index) => (
                 <div
                   key={index}
                   className="bg-primary-500 rounded-t"
                   style={{
-                    height: `${(point.value / Math.max(...data.map(d => d.value))) * 100}%`,
+                    height: `${(point.value / Math.max(...safeData.map(d => d.value))) * 100}%`,
                     width: '12%',
                     minHeight: '20px',
                   }}
@@ -171,9 +174,9 @@ export const Chart: React.FC<ChartProps> = ({
           )}
         </div>
         
-        {showLegend && data.length > 0 && (
+        {showLegend && safeData.length > 0 && (
           <div className="mt-4 grid grid-cols-2 gap-2">
-            {data.slice(0, 4).map((point, index) => (
+            {safeData.slice(0, 4).map((point, index) => (
               <div key={index} className="flex items-center space-x-2">
                 <div 
                   className="w-3 h-3 rounded-full"

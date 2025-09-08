@@ -1,5 +1,8 @@
-import React from 'react';
-import { MetricCard } from '@/components/dashboard/MetricCard';
+"use client";
+
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { StandardLayout } from '@/components/layout/StandardLayout';
+import { StandardMetricCard } from '@/components/dashboard/StandardMetricCard';
 import { Chart } from '@/components/dashboard/Chart';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
 import { Card } from '@/components/ui/Card';
@@ -8,17 +11,14 @@ import { AnimatedCard } from '@/components/ui/AnimatedCard';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { ExportButton } from '@/components/ui/ExportButton';
 import { OnboardingTour } from '@/components/onboarding/OnboardingTour';
+import DemoUserCard from '@/components/demo/DemoUserCard';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { 
   TrendingUp, 
   Users, 
   Briefcase, 
   DollarSign,
-  Plus,
-  Bell,
-  Bot,
-  Zap,
-  Target,
-  Filter
+  Plus
 } from 'lucide-react';
 
 /**
@@ -33,25 +33,26 @@ import {
  * - Consistent with AIAIAI Consulting design system
  */
 export default function DashboardPage() {
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [showOnboarding, setShowOnboarding] = React.useState(false);
-  const [showFilters, setShowFilters] = React.useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
-  // Check if user is new (first time visiting)
-  React.useEffect(() => {
+  // 🚀 OPTIMIZED ONBOARDING CHECK
+  useEffect(() => {
     const hasSeenOnboarding = localStorage.getItem('aiaiai-onboarding-seen');
     if (!hasSeenOnboarding) {
       setShowOnboarding(true);
     }
   }, []);
 
-  const handleOnboardingComplete = () => {
+  // 🚀 MEMOIZED ONBOARDING HANDLER
+  const handleOnboardingComplete = useCallback(() => {
     localStorage.setItem('aiaiai-onboarding-seen', 'true');
     setShowOnboarding(false);
-  };
+  }, []);
 
-  // Mock data for demonstration
-  const metrics = [
+  // 🚀 MEMOIZED METRICS DATA
+  const metrics = useMemo(() => [
     {
       title: 'Agentes Activos',
       value: '12',
@@ -84,9 +85,10 @@ export default function DashboardPage() {
       icon: DollarSign,
       description: 'Ingresos recurrentes mensuales'
     }
-  ];
+  ], []);
 
-  const quickActions = [
+  // 🚀 MEMOIZED QUICK ACTIONS
+  const quickActions = useMemo(() => [
     {
       title: 'Nuevo Agente',
       description: 'Crear un nuevo agente de IA',
@@ -108,63 +110,67 @@ export default function DashboardPage() {
       href: '/reports',
       variant: 'secondary' as const
     }
-  ];
+  ], []);
 
-  // Mock data for export
-  const exportData = [
+  // 🚀 MEMOIZED EXPORT DATA
+  const exportData = useMemo(() => [
     { agent: 'Meeting Summarizer', status: 'Activo', tasks: 45, success: '98%' },
     { agent: 'Proposal Builder', status: 'Activo', tasks: 23, success: '95%' },
     { agent: 'Lead Scorer', status: 'Activo', tasks: 67, success: '92%' },
     { agent: 'CRM Updater', status: 'Inactivo', tasks: 12, success: '89%' },
     { agent: 'Follow-up Scheduler', status: 'Activo', tasks: 34, success: '96%' }
-  ];
+  ], []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header with Search and Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-        <div className="mb-4 sm:mb-0">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Bienvenido a tu centro de control AIAIAI Consulting</p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="w-64">
-            <SearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="Buscar agentes, clientes..."
-              showFilters={true}
-              onFilterClick={() => setShowFilters(!showFilters)}
+    <ProtectedRoute>
+      <StandardLayout
+        title="Dashboard"
+        subtitle="Bienvenido a tu centro de control AIAIAI Consulting"
+        actions={
+          <div className="flex items-center space-x-4">
+            <div className="w-64">
+              <SearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Buscar agentes, clientes..."
+                showFilters={true}
+                onFilterClick={() => setShowFilters(!showFilters)}
+              />
+            </div>
+            <ExportButton
+              data={exportData}
+              filename="dashboard-data"
+              variant="outline"
+              size="sm"
             />
           </div>
-          <ExportButton
-            data={exportData}
-            filename="dashboard-data"
-            variant="outline"
-            size="sm"
-          />
+        }
+      >
+        {/* Demo User Card */}
+        <div className="mb-8">
+          <DemoUserCard />
         </div>
-      </div>
 
-      {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {metrics.map((metric, index) => (
-          <AnimatedCard
-            key={index}
-            delay={index * 100}
-            direction="up"
-          >
-            <MetricCard
-              title={metric.title}
-              value={metric.value}
-              change={metric.change}
-              changeType={metric.changeType}
-              icon={metric.icon}
-              description={metric.description}
-            />
-          </AnimatedCard>
-        ))}
-      </div>
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {metrics.map((metric, index) => (
+            <AnimatedCard
+              key={index}
+              delay={index * 100}
+              direction="up"
+            >
+              <StandardMetricCard
+                title={metric.title}
+                value={metric.value}
+                change={metric.change}
+                changeType={metric.changeType}
+                icon={metric.icon}
+                description={metric.description}
+                color={index === 0 ? 'blue' : index === 1 ? 'green' : index === 2 ? 'purple' : 'yellow'}
+              />
+            </AnimatedCard>
+          ))}
+        </div>
 
       {/* Charts and Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
@@ -188,7 +194,17 @@ export default function DashboardPage() {
                   </Button>
                 </div>
               </div>
-              <Chart />
+              <Chart 
+                title="Rendimiento de Agentes"
+                data={[
+                  { label: 'Ene', value: 85 },
+                  { label: 'Feb', value: 88 },
+                  { label: 'Mar', value: 92 },
+                  { label: 'Abr', value: 89 },
+                  { label: 'May', value: 94 },
+                  { label: 'Jun', value: 91 }
+                ]}
+              />
             </Card>
           </AnimatedCard>
         </div>
@@ -200,7 +216,14 @@ export default function DashboardPage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-6">
                 Actividad Reciente
               </h2>
-              <RecentActivity />
+              <RecentActivity 
+                activities={[
+                  { id: '1', type: 'agent', message: 'Nuevo agente creado', time: 'Hace 2 horas' },
+                  { id: '2', type: 'client', message: 'Cliente agregado', time: 'Hace 4 horas' },
+                  { id: '3', type: 'project', message: 'Proyecto completado', time: 'Ayer' },
+                  { id: '4', type: 'report', message: 'Reporte generado', time: 'Hace 2 días' }
+                ]}
+              />
             </Card>
           </AnimatedCard>
         </div>
@@ -266,6 +289,7 @@ export default function DashboardPage() {
         onClose={() => setShowOnboarding(false)}
         onComplete={handleOnboardingComplete}
       />
-    </div>
+      </StandardLayout>
+    </ProtectedRoute>
   );
 }

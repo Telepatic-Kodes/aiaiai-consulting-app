@@ -1,17 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
- * Dashboard API Route
+ * 🚀 OPTIMIZED Dashboard API Route
  * 
  * Features:
  * - GET: Retrieve dashboard metrics and data
+ * - Response caching
  * - Professional error handling
+ * - Performance monitoring
  * - Consistent with AIAIAI Consulting design system
  */
 
+// 🚀 CACHE CONFIGURATION
+const CACHE_DURATION = 5 * 60; // 5 minutes
+const cache = new Map<string, { data: any; timestamp: number }>();
+
 export async function GET(request: NextRequest) {
+  const startTime = performance.now();
+  
   try {
-    // Mock data for demonstration
+    // 🚀 CHECK CACHE FIRST
+    const cacheKey = 'dashboard-data';
+    const cached = cache.get(cacheKey);
+    
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION * 1000) {
+      const responseTime = performance.now() - startTime;
+      
+      return NextResponse.json({
+        success: true,
+        data: cached.data,
+        meta: {
+          generatedAt: new Date().toISOString(),
+          version: '1.0.0',
+          cached: true,
+          responseTime: `${responseTime.toFixed(2)}ms`
+        }
+      }, {
+        headers: {
+          'Cache-Control': 'public, max-age=300, stale-while-revalidate=60',
+          'X-Response-Time': `${responseTime.toFixed(2)}ms`
+        }
+      });
+    }
+
+    // 🚀 GENERATE FRESH DATA
     const dashboardData = {
       metrics: {
         activeAgents: {
@@ -146,23 +178,46 @@ export async function GET(request: NextRequest) {
       ]
     };
 
+    // 🚀 CACHE THE DATA
+    cache.set(cacheKey, {
+      data: dashboardData,
+      timestamp: Date.now()
+    });
+
+    const responseTime = performance.now() - startTime;
+
     return NextResponse.json({
       success: true,
       data: dashboardData,
       meta: {
         generatedAt: new Date().toISOString(),
-        version: '1.0.0'
+        version: '1.0.0',
+        cached: false,
+        responseTime: `${responseTime.toFixed(2)}ms`
+      }
+    }, {
+      headers: {
+        'Cache-Control': 'public, max-age=300, stale-while-revalidate=60',
+        'X-Response-Time': `${responseTime.toFixed(2)}ms`
       }
     });
   } catch (error) {
+    const responseTime = performance.now() - startTime;
+    
     console.error('Error fetching dashboard data:', error);
     return NextResponse.json(
       {
         success: false,
         error: 'Error interno del servidor',
-        message: 'No se pudieron obtener los datos del dashboard'
+        message: 'No se pudieron obtener los datos del dashboard',
+        responseTime: `${responseTime.toFixed(2)}ms`
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'X-Response-Time': `${responseTime.toFixed(2)}ms`
+        }
+      }
     );
   }
 }

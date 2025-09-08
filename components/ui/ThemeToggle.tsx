@@ -1,68 +1,59 @@
+"use client";
+
 import React from 'react';
-import { Sun, Moon, Monitor } from 'lucide-react';
-import { Button } from './Button';
-import { themeManager, Theme } from '@/lib/theme';
+import { useTheme } from '@/lib/theme-context';
+import { cn } from '@/lib/utils';
 
-/**
- * Theme Toggle Component
- * 
- * Features:
- * - Light/Dark/System mode toggle
- * - Smooth transitions
- * - Professional icons
- * - Accessibility compliant
- */
-export function ThemeToggle() {
-  const [theme, setTheme] = React.useState<Theme>(themeManager.getTheme());
+interface ThemeToggleProps {
+  className?: string;
+}
 
-  React.useEffect(() => {
-    const unsubscribe = themeManager.subscribe(setTheme);
-    return unsubscribe;
-  }, []);
-
-  const handleThemeChange = (newTheme: Theme) => {
-    themeManager.setTheme(newTheme);
-  };
-
-  const getIcon = () => {
-    switch (theme) {
-      case 'light':
-        return <Sun className="h-4 w-4" />;
-      case 'dark':
-        return <Moon className="h-4 w-4" />;
-      case 'system':
-        return <Monitor className="h-4 w-4" />;
-    }
-  };
-
-  const getLabel = () => {
-    switch (theme) {
-      case 'light':
-        return 'Modo Claro';
-      case 'dark':
-        return 'Modo Oscuro';
-      case 'system':
-        return 'Sistema';
-    }
-  };
+export function ThemeToggle({ className }: ThemeToggleProps) {
+  const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="relative">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => {
-          const themes: Theme[] = ['light', 'dark', 'system'];
-          const currentIndex = themes.indexOf(theme);
-          const nextIndex = (currentIndex + 1) % themes.length;
-          handleThemeChange(themes[nextIndex]);
-        }}
-        className="flex items-center space-x-2"
-        title={`Cambiar tema - Actual: ${getLabel()}`}
-      >
-        {getIcon()}
-        <span className="hidden sm:inline">{getLabel()}</span>
-      </Button>
-    </div>
+    <button
+      onClick={toggleTheme}
+      className={cn(
+        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+        theme === 'dark' ? 'bg-blue-600' : 'bg-gray-200',
+        className
+      )}
+    >
+      <span
+        className={cn(
+          "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+          theme === 'dark' ? 'translate-x-6' : 'translate-x-1'
+        )}
+      />
+      <span className="sr-only">
+        {theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+      </span>
+    </button>
+  );
+}
+
+export function ThemeToggleWithIcon({ className }: ThemeToggleProps) {
+  const { theme, toggleTheme } = useTheme();
+
+  return (
+    <button
+      onClick={toggleTheme}
+      className={cn(
+        "p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors",
+        className
+      )}
+      title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+    >
+      {theme === 'dark' ? (
+        <svg className="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      ) : (
+        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      )}
+    </button>
   );
 }

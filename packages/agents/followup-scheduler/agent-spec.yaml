@@ -1,0 +1,154 @@
+apiVersion: v1
+kind: AgentSpec
+name: followup.scheduler
+version: 1.0.0
+owner: AIAIAI Consulting
+responsibility: "Automatizar seguimientos y agendamiento de reuniones basado en comportamiento del cliente"
+description: "Agente especializado en gestión de seguimientos que programa automáticamente recordatorios y reuniones basado en patrones de comportamiento"
+
+inputs:
+  - client_interaction_data:
+      type: object
+      required: true
+      description: "Datos de interacciones con el cliente"
+      schema:
+        last_contact: { type: string }
+        interaction_type: { type: string }
+        response_status: { type: string }
+        engagement_level: { type: number }
+        preferred_contact_method: { type: string }
+  - followup_rules:
+      type: object
+      required: false
+      description: "Reglas de seguimiento personalizadas"
+      schema:
+        frequency: { type: string }
+        max_attempts: { type: number }
+        escalation_rules: { type: array }
+        preferred_times: { type: array }
+  - calendar_constraints:
+      type: object
+      required: false
+      description: "Restricciones de calendario y disponibilidad"
+      schema:
+        business_hours: { type: object }
+        timezone: { type: string }
+        blocked_times: { type: array }
+        meeting_duration: { type: number }
+
+outputs:
+  - scheduled_followups:
+      type: array
+      description: "Seguimientos programados"
+      items:
+        type: object
+        schema:
+          followup_id: { type: string }
+          scheduled_date: { type: string }
+          followup_type: { type: string }
+          priority: { type: string }
+          assigned_to: { type: string }
+  - meeting_invitations:
+      type: array
+      description: "Invitaciones de reunión generadas"
+      items:
+        type: object
+        schema:
+          meeting_id: { type: string }
+          title: { type: string }
+          date_time: { type: string }
+          participants: { type: array }
+          agenda: { type: string }
+  - reminder_schedule:
+      type: object
+      description: "Cronograma de recordatorios"
+      schema:
+        email_reminders: { type: array }
+        sms_reminders: { type: array }
+        whatsapp_reminders: { type: array }
+  - followup_analytics:
+      type: object
+      description: "Análisis de efectividad de seguimientos"
+      schema:
+        response_rate: { type: number }
+        conversion_rate: { type: number }
+        optimal_timing: { type: string }
+        recommended_adjustments: { type: array }
+
+policies:
+  mode: [auto, review, approve]
+  sla_seconds: 45
+  retry_attempts: 3
+  timeout_seconds: 120
+
+tools:
+  - calendar.schedule
+  - email.automation
+  - sms.send
+  - whatsapp.send
+  - analytics.track
+
+observability:
+  metrics:
+    - scheduling_accuracy
+    - response_rates
+    - conversion_rates
+    - automation_efficiency
+  logs: structured
+  alerts:
+    - low_response_rate: "< 20%"
+    - scheduling_conflicts: "> 10%"
+    - high_cancellation_rate: "> 15%"
+
+pricing:
+  base_price: 49
+  currency: "USD"
+  billing_period: "monthly"
+  usage_tiers:
+    - tier: "starter"
+      price: 49
+      included_followups: 500
+      overage_rate: 0.10
+    - tier: "professional"
+      price: 99
+      included_followups: 2000
+      overage_rate: 0.08
+    - tier: "enterprise"
+      price: 199
+      included_followups: 10000
+      overage_rate: 0.05
+
+integration_requirements:
+  calendar_systems:
+    - google_calendar
+    - outlook_calendar
+    - cal.com
+    - calendly
+  communication_channels:
+    - email
+    - sms
+    - whatsapp_business
+    - slack
+    - teams
+  crm_systems:
+    - salesforce
+    - hubspot
+    - pipedrive
+  meeting_platforms:
+    - zoom
+    - teams
+    - google_meet
+
+automation_features:
+  - intelligent_scheduling
+  - response_tracking
+  - escalation_management
+  - multi_channel_communication
+  - performance_optimization
+
+latam_features:
+  - spanish_communication
+  - local_timezone_handling
+  - whatsapp_business_integration
+  - regional_holiday_calendar
+  - cultural_communication_patterns

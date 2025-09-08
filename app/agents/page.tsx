@@ -1,289 +1,226 @@
-import React from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { MetricCard } from '@/components/dashboard/MetricCard';
+"use client";
+
+import React, { useState } from 'react';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { StandardLayout } from '@/components/layout/StandardLayout';
+import { StandardMetricCard } from '@/components/dashboard/StandardMetricCard';
 import { 
-  Bot, 
-  Plus, 
-  Settings, 
-  Play, 
-  Pause, 
-  TrendingUp,
-  Users,
-  Clock,
-  CheckCircle,
-  AlertCircle
+  Monitor,
+  Users, 
+  Briefcase, 
+  DollarSign,
+  Plus
 } from 'lucide-react';
 
-/**
- * Agents Management Page
- * 
- * Features:
- * - Agent catalog overview
- * - Agent status monitoring
- * - Quick actions
- * - Performance metrics
- * - Professional UI/UX
- * - Consistent with AIAIAI Consulting design system
- */
+interface Agent {
+  id: string;
+  name: string;
+  type: string;
+  status: 'active' | 'inactive' | 'training';
+  performance: number;
+  lastActive: string;
+  tasks: number;
+  responseTime?: number;
+  accuracy?: number;
+  cost?: number;
+  capabilities?: string[];
+}
+
+const mockAgents: Agent[] = [
+  {
+    id: '1',
+    name: 'Meeting Summarizer',
+    type: 'NLP',
+    status: 'active',
+    performance: 95,
+    lastActive: 'Hace 2 horas',
+    tasks: 45,
+    responseTime: 1.2,
+    accuracy: 98,
+    cost: 0.05,
+    capabilities: ['Análisis de texto', 'Resumen automático']
+  },
+  {
+    id: '2',
+    name: 'Proposal Builder',
+    type: 'Generative',
+    status: 'active',
+    performance: 88,
+    lastActive: 'Hace 1 hora',
+    tasks: 23,
+    responseTime: 2.1,
+    accuracy: 95,
+    cost: 0.08,
+    capabilities: ['Generación de contenido', 'Análisis de propuestas']
+  },
+  {
+    id: '3',
+    name: 'Lead Scorer',
+    type: 'ML',
+    status: 'training',
+    performance: 75,
+    lastActive: 'Hace 3 horas',
+    tasks: 12,
+    responseTime: 1.8,
+    accuracy: 92,
+    cost: 0.06,
+    capabilities: ['Scoring de leads', 'Predicción de conversión']
+  }
+];
+
 export default function AgentsPage() {
-  // Mock data for demonstration
-  const agentMetrics = [
-    {
-      title: 'Agentes Activos',
-      value: '5',
-      change: 2,
-      changeType: 'number' as const,
-      icon: Bot,
-      trend: 'up' as const,
-      description: 'Agentes ejecutando tareas'
-    },
-    {
-      title: 'Tareas Completadas',
-      value: '1,247',
-      change: 156,
-      changeType: 'number' as const,
-      icon: CheckCircle,
-      trend: 'up' as const,
-      description: 'Este mes'
-    },
-    {
-      title: 'Tiempo Promedio',
-      value: '2.3m',
-      change: -0.5,
-      changeType: 'number' as const,
-      icon: Clock,
-      trend: 'up' as const,
-      description: 'Por tarea'
-    },
-    {
-      title: 'Precisión Promedio',
-      value: '94.2%',
-      change: 2.1,
-      changeType: 'percentage' as const,
-      icon: TrendingUp,
-      trend: 'up' as const,
-      description: 'Tasa de éxito'
-    }
-  ];
-
-  const agents = [
-    {
-      id: 'meeting.summarizer',
-      name: 'Meeting Summarizer',
-      description: 'Resumen automático de reuniones con extracción de tareas accionables',
-      status: 'active',
-      version: '1.0.0',
-      tasksCompleted: 342,
-      accuracy: 94.2,
-      lastRun: '2025-01-15T10:30:00Z',
-      category: 'Operaciones & Cliente',
-      pricing: '$39/mes'
-    },
-    {
-      id: 'proposal.builder',
-      name: 'Proposal Builder',
-      description: 'Generación automática de propuestas comerciales profesionales',
-      status: 'active',
-      version: '1.0.0',
-      tasksCompleted: 89,
-      accuracy: 96.8,
-      lastRun: '2025-01-15T09:15:00Z',
-      category: 'Comercial & Marketing',
-      pricing: '$79/mes'
-    },
-    {
-      id: 'lead.scorer',
-      name: 'Lead Scorer',
-      description: 'Calificación automática de leads con análisis de comportamiento',
-      status: 'active',
-      version: '1.0.0',
-      tasksCompleted: 567,
-      accuracy: 91.5,
-      lastRun: '2025-01-15T11:45:00Z',
-      category: 'Comercial & Marketing',
-      pricing: '$49/mes'
-    },
-    {
-      id: 'crm.updater',
-      name: 'CRM Updater',
-      description: 'Sincronización automática de datos entre sistemas',
-      status: 'development',
-      version: '0.9.0',
-      tasksCompleted: 123,
-      accuracy: 98.1,
-      lastRun: '2025-01-14T16:20:00Z',
-      category: 'Operaciones & Cliente',
-      pricing: '$59/mes'
-    },
-    {
-      id: 'followup.scheduler',
-      name: 'Follow-up Scheduler',
-      description: 'Automatización de seguimientos y agendamiento',
-      status: 'development',
-      version: '0.8.0',
-      tasksCompleted: 78,
-      accuracy: 89.3,
-      lastRun: '2025-01-14T14:10:00Z',
-      category: 'Comercial & Marketing',
-      pricing: '$49/mes'
-    }
-  ];
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'text-green-600 bg-green-50 border-green-200';
-      case 'development':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'inactive':
-        return 'text-gray-600 bg-gray-50 border-gray-200';
-      default:
-        return 'text-gray-600 bg-gray-50 border-gray-200';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'active':
-        return <CheckCircle className="h-4 w-4" />;
-      case 'development':
-        return <AlertCircle className="h-4 w-4" />;
-      case 'inactive':
-        return <Pause className="h-4 w-4" />;
-      default:
-        return <AlertCircle className="h-4 w-4" />;
-    }
-  };
+  const [agents] = useState<Agent[]>(mockAgents);
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'comparison'>('overview');
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Gestión de Agentes
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Administra y monitorea tus agentes de IA especializados
-            </p>
-          </div>
+    <ProtectedRoute>
+      <StandardLayout
+        title="Gestión de Agentes"
+        subtitle="Administra y monitorea tus agentes de IA"
+        actions={
           <div className="flex space-x-3">
-            <Button variant="outline" leftIcon={<Settings className="h-4 w-4" />}>
-              Configuración
-            </Button>
-            <Button leftIcon={<Plus className="h-4 w-4" />}>
-              Nuevo Agente
-            </Button>
+            <button
+              onClick={() => window.location.href = '/agents/catalog'}
+              className="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              Catálogo
+            </button>
+            <button
+              onClick={() => window.location.href = '/agents/new'}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Crear Nuevo Agente
+            </button>
+          </div>
+        }
+      >
+        {/* Tabs */}
+        <div className="mb-8">
+          <div className="border-b border-gray-200 dark:border-gray-700">
+            <nav className="-mb-px flex space-x-8">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'overview'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
+              >
+                Resumen
+              </button>
+              <button
+                onClick={() => setActiveTab('analytics')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'analytics'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
+              >
+                Analytics
+              </button>
+              <button
+                onClick={() => setActiveTab('comparison')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'comparison'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
+              >
+                Comparación
+              </button>
+            </nav>
           </div>
         </div>
-      </div>
 
-      {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {agentMetrics.map((metric, index) => (
-          <MetricCard
-            key={index}
-            title={metric.title}
-            value={metric.value}
-            change={metric.change}
-            changeType={metric.changeType}
-            icon={metric.icon}
-            trend={metric.trend}
-            description={metric.description}
-          />
-        ))}
-      </div>
+        {/* Tab Content */}
+        {activeTab === 'overview' && (
+          <>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <StandardMetricCard
+                title="Total Agentes"
+                value={agents.length}
+                icon={Monitor}
+                color="blue"
+                description="Agentes en el sistema"
+              />
+              <StandardMetricCard
+                title="Activos"
+                value={agents.filter(a => a.status === 'active').length}
+                icon={Users}
+                color="green"
+                description="Agentes ejecutando tareas"
+              />
+              <StandardMetricCard
+                title="Entrenando"
+                value={agents.filter(a => a.status === 'training').length}
+                icon={Briefcase}
+                color="yellow"
+                description="Agentes en proceso de aprendizaje"
+              />
+              <StandardMetricCard
+                title="Promedio Rendimiento"
+                value={`${Math.round(agents.reduce((acc, agent) => acc + agent.performance, 0) / agents.length)}%`}
+                icon={DollarSign}
+                color="purple"
+                description="Eficiencia general del sistema"
+              />
+            </div>
 
-      {/* Agents Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {agents.map((agent) => (
-          <Card key={agent.id} className="hover:shadow-lg transition-all duration-200">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="h-12 w-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                    <Bot className="h-6 w-6 text-primary-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {agent.name}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      v{agent.version}
-                    </p>
-                  </div>
-                </div>
-                <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(agent.status)}`}>
-                  {getStatusIcon(agent.status)}
-                  <span className="ml-1 capitalize">{agent.status}</span>
+            {/* Agents List */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="p-6">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Lista de Agentes
+                </h2>
+                <div className="space-y-4">
+                  {agents.map((agent) => (
+                    <div key={agent.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                          <Monitor className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-gray-900 dark:text-white">{agent.name}</h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{agent.type}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          agent.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                          agent.status === 'training' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                          'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                        }`}>
+                          {agent.status === 'active' ? 'Activo' : agent.status === 'training' ? 'Entrenando' : 'Inactivo'}
+                        </span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{agent.performance}%</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </CardHeader>
-            
-            <CardContent>
-              <p className="text-gray-600 mb-4">
-                {agent.description}
-              </p>
-              
-              <div className="space-y-3 mb-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Categoría:</span>
-                  <span className="text-sm font-medium text-gray-900">
-                    {agent.category}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Tareas completadas:</span>
-                  <span className="text-sm font-medium text-gray-900">
-                    {agent.tasksCompleted.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Precisión:</span>
-                  <span className="text-sm font-medium text-green-600">
-                    {agent.accuracy}%
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Precio:</span>
-                  <span className="text-sm font-medium text-gray-900">
-                    {agent.pricing}
-                  </span>
-                </div>
-              </div>
-              
-              <div className="flex space-x-2">
-                <Button 
-                  variant="primary" 
-                  size="sm" 
-                  className="flex-1"
-                  leftIcon={<Play className="h-4 w-4" />}
-                >
-                  {agent.status === 'active' ? 'Ejecutar' : 'Activar'}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  leftIcon={<Settings className="h-4 w-4" />}
-                >
-                  Configurar
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            </div>
+          </>
+        )}
 
-      {/* AIAIAI Consulting Branding */}
-      <div className="text-center py-8 mt-12">
-        <div className="inline-flex items-center space-x-2 text-gray-500">
-          <span className="text-sm">Powered by</span>
-          <span className="font-semibold text-primary-600">AIAIAI Consulting</span>
-          <span className="text-sm">- Tú enseñas. Ellos ejecutan. Tú creces.</span>
-        </div>
-      </div>
-    </div>
+        {activeTab === 'analytics' && (
+          <div className="text-center py-12">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Analytics</h3>
+            <p className="text-gray-600 dark:text-gray-400">Funcionalidad de analytics en desarrollo.</p>
+          </div>
+        )}
+
+        {activeTab === 'comparison' && (
+          <div className="text-center py-12">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Comparación</h3>
+            <p className="text-gray-600 dark:text-gray-400">Funcionalidad de comparación en desarrollo.</p>
+          </div>
+        )}
+      </StandardLayout>
+    </ProtectedRoute>
   );
 }

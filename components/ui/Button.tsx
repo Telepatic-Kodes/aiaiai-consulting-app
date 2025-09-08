@@ -49,34 +49,34 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantClasses = {
       primary: [
-        'bg-primary-600 text-white',
-        'hover:bg-primary-700 focus:ring-primary-500',
-        'shadow-sm hover:shadow-md',
+        'bg-blue-600 text-white dark:bg-blue-700',
+        'hover:bg-blue-700 dark:hover:bg-blue-800 focus:ring-blue-500',
+        'shadow-sm hover:shadow-md transition-all duration-200',
       ],
       secondary: [
-        'bg-gray-100 text-gray-900',
-        'hover:bg-gray-200 focus:ring-gray-500',
-        'border border-gray-300',
+        'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100',
+        'hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-gray-500',
+        'border border-gray-300 dark:border-gray-600',
       ],
       outline: [
-        'border border-primary-600 text-primary-600',
-        'hover:bg-primary-50 focus:ring-primary-500',
+        'border border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400',
+        'hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:ring-blue-500',
         'bg-transparent',
       ],
       ghost: [
-        'text-gray-700 hover:bg-gray-100',
+        'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800',
         'focus:ring-gray-500',
         'bg-transparent',
       ],
       destructive: [
-        'bg-red-600 text-white',
-        'hover:bg-red-700 focus:ring-red-500',
-        'shadow-sm hover:shadow-md',
+        'bg-red-600 text-white dark:bg-red-700',
+        'hover:bg-red-700 dark:hover:bg-red-800 focus:ring-red-500',
+        'shadow-sm hover:shadow-md transition-all duration-200',
       ],
     };
 
     const sizeClasses = {
-      sm: 'px-3 py-1.5 text-sm rounded-md',
+      sm: 'px-3 py-1.5 text-sm rounded-lg',
       md: 'px-4 py-2 text-sm rounded-lg',
       lg: 'px-6 py-3 text-base rounded-lg',
     };
